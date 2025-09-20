@@ -40,6 +40,7 @@ public class ChessBoard {
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
      */
+    // What would be a more efficient way to do this?
     public void resetBoard() {
         // Clear the board first
         squares = new ChessPiece[8][8];
