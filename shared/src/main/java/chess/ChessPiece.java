@@ -1,8 +1,7 @@
 package chess;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -56,45 +55,23 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        ChessPiece piece = board.getPiece(myPosition);
-        List<ChessMove> moves = new ArrayList<>();
-        if (piece.getPieceType() == PieceType.BISHOP) {
-            // All four diagonal directions: (rowChange, colChange)
-            int[][] directions = {
-                    {1, 1},   // down-right
-                    {1, -1},  // down-left
-                    {-1, 1},  // up-right
-                    {-1, -1}  // up-left
-            };
+        return PieceMovesCalculator.calculateMoves(board, myPosition);
+    }
 
-            for (int[] dir : directions) {
-                int row = myPosition.getRow();
-                int col = myPosition.getColumn();
-
-                while (true) {
-                    row += dir[0];
-                    col += dir[1];
-
-                    // stop if outside board
-                    if (row < 1 || row > 8 || col < 1 || col > 8) break;
-
-                    ChessPosition newPos = new ChessPosition(row, col);
-                    ChessPiece occupying = board.getPiece(newPos);
-
-                    if (occupying == null) {
-                        // empty square → valid move
-                        moves.add(new ChessMove(myPosition, newPos, null));
-                    } else {
-                        // occupied → check capture
-                        if (occupying.getTeamColor() != piece.getTeamColor()) {
-                            moves.add(new ChessMove(myPosition, newPos, null));
-                        }
-                        // stop in either case
-                        break;
-                    }
-                }
-            }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
         }
-        return moves;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessPiece that = (ChessPiece) o;
+        return pieceColor == that.pieceColor && type == that.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pieceColor, type);
     }
 }
