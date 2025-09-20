@@ -182,6 +182,7 @@ public class PieceMovesCalculator {
     /**
      * Helper to add all four promotion moves for a pawn.
      */
+    // Understand promotion moves better and an easy way to manage them for the exam
     private static void addPromotionMoves(Collection<ChessMove> moves, ChessPosition start, ChessPosition end) {
         moves.add(new ChessMove(start, end, ChessPiece.PieceType.QUEEN));
         moves.add(new ChessMove(start, end, ChessPiece.PieceType.ROOK));
