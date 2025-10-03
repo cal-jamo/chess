@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -51,7 +52,39 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        ChessPiece piece = board.getPiece(startPosition);
+        if (piece == null) {
+            return null;
+        }
+
+        TeamColor teamColor = piece.getTeamColor();
+        Collection<ChessMove> potentialMoves = piece.pieceMoves(board, startPosition);
+        Collection<ChessMove> legalMoves = new HashSet<>();
+
+        for (ChessMove move : potentialMoves) {
+            ChessBoard tempBoard = new ChessBoard();
+            for (int r = 1; r <= 8; r++) {
+                for (int c = 1; c <= 8; c++) {
+                    ChessPosition pos = new ChessPosition(r,c);
+                    tempBoard.addPiece(pos, this.board.getPiece(pos));
+                }
+            }
+
+            ChessPiece pieceToMove = tempBoard.getPiece(move.getStartPosition());
+
+            if (move.getPromotionPiece() != null) {
+                pieceToMove = new ChessPiece(teamColor, move.getPromotionPiece());
+            }
+
+            tempBoard.addPiece(move.getEndPosition(), pieceToMove);
+            tempBoard.addPiece(move.getStartPosition(), null);
+
+            if (!isKingInCheckOnBoard(tempBoard, teamColor)) {
+                legalMoves.add(move);
+            }
+        }
+
+        return legalMoves;
     }
 
     /**
@@ -149,6 +182,7 @@ public class ChessGame {
     public ChessBoard getBoard() {
         return this.board;
     }
+
 
 
 }
