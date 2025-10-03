@@ -63,9 +63,9 @@ public class ChessGame {
 
         for (ChessMove move : potentialMoves) {
             ChessBoard tempBoard = new ChessBoard();
-            for (int r = 1; r <= 8; r++) {
-                for (int c = 1; c <= 8; c++) {
-                    ChessPosition pos = new ChessPosition(r,c);
+            for (int row = 1; row <= 8; row++) {
+                for (int col = 1; col <= 8; col++) {
+                    ChessPosition pos = new ChessPosition(row,col);
                     tempBoard.addPiece(pos, this.board.getPiece(pos));
                 }
             }
