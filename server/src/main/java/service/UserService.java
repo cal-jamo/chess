@@ -25,4 +25,12 @@ public class UserService {
         userDAO.insertUser(user);
         return authDAO.createAuth(user.username());
     }
+
+    public AuthData loginUser(AuthData authData) throws DataAccessException{
+
+    }
+
+    public AuthData logoutUser(AuthData authData) throws DataAccessException{
+
+    }
 }

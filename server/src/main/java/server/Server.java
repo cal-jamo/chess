@@ -54,6 +54,16 @@ public class Server {
             }
         });
 
+        // endpoint for post method to log in a user
+        javalin.post("/session", (req) -> {
+
+        });
+
+        // endpoint for delete method to logout a user
+        javalin.delete("/session", (req) -> {
+
+        });
+
 
     }
 
