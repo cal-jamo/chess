@@ -19,7 +19,13 @@ public class GameService {
 
     // take authToken and gameName as parameters, and create and store the game data
     public int createGame(String authToken, String gameName) throws DataAccessException {
-        return 0;
+        if (authDAO.getAuth(authToken) == null) {
+            throw new DataAccessException("Error: Unauthorized");
+        }
+        if (gameName == null) {
+            throw new DataAccessException("Error: Bad Request");
+        }
+        return gameDAO.createGame(gameName);
     }
 
     // take authToken as a param and if auth token is valid return the list of games stored in memory

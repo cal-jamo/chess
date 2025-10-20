@@ -107,6 +107,26 @@ public class Server {
             }
         });
 
+        // endpoint to create a new game given a valid auth token and game name
+        javalin.post("/game", (req) -> {
+            try {
+                String authToken = req.header("authorization");
+                String gameName  = req.body();
+                gameService.createGame(authToken, req.body());
+                req.status(200).json(java.util.Map.of("gameName", gameName));
+            } catch (DataAccessException e) {
+                if (e.getMessage().equals("Error: Bad Request")) {
+                    req.status(400).json(java.util.Map.of("message", e.getMessage()));
+                }
+                if (e.getMessage().equals("Error: Unauthorized")) {
+                    req.status(401).json(java.util.Map.of("message", e.getMessage()));
+                } else {
+                    req.status(500).json(java.util.Map.of("message", e.getMessage()));
+                }
+
+            }
+        });
+
 
     }
 
