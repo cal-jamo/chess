@@ -1,11 +1,16 @@
 package server;
 
+import com.google.gson.Gson;
 import dataaccess.*;
 import io.javalin.*;
 import model.AuthData;
 import model.UserData;
 import service.ResetService;
 import service.UserService;
+
+import java.util.Map;
+
+import static com.fasterxml.jackson.databind.type.LogicalType.Map;
 
 public class Server {
 
@@ -34,17 +39,16 @@ public class Server {
 
         javalin.post("/user", (req) -> {
             try {
-                UserData userData = req.bodyAsClass(UserData.class);
+                UserData userData = new Gson().fromJson(req.body(), UserData.class);
                 AuthData authData = userService.registerUser(userData);
-                req.json(authData);
-                req.status(200);
+                req.status(200).json(authData);
             } catch (DataAccessException e) {
-                if (e.getMessage().equals("Username already exists")) {
-                    req.status(409);
-                } else if (e.getMessage().equals("Username and password cannot be null")) {
-                    req.status(400);
+                if (e.getMessage().equals("Error: Username already exists")) {
+                    req.status(403).json(java.util.Map.of("message", e.getMessage()));
+                } else if (e.getMessage().equals("Error: Username and password cannot be null")) {
+                    req.status(400).json(java.util.Map.of("message", e.getMessage()));
                 } else {
-                    req.status(500);
+                    req.status(500).json(java.util.Map.of("message", e.getMessage()));
                 }
             }
         });

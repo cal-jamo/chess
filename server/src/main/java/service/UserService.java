@@ -15,11 +15,11 @@ public class UserService {
     // Additional methods to manage users can be added here
     public AuthData registerUser(UserData user) throws DataAccessException{
         if (user.username() == null || user.password() == null) {
-            throw new DataAccessException("Username and password cannot be null");
+            throw new DataAccessException("Error: Username and password cannot be null");
         }
 
         if (userDAO.getUser(user.username()) != null) {
-            throw new DataAccessException("Username already exists");
+            throw new DataAccessException("Error: Username already exists");
         }
 
         userDAO.insertUser(user);
