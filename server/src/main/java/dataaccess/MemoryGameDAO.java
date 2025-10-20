@@ -6,12 +6,12 @@ import java.util.HashMap;
 
 public class MemoryGameDAO implements GameDAO {
     private final HashMap<Integer, GameData> storedGames = new HashMap<>();
-    private int newGameID = 1;
+    private int nextGameID = 1;
 
     // function to create a game. A game name is passed in, an ID is created and assigned, and a new chess game is initialized
     @Override
     public int createGame(String gameName) {
-        int gameID = newGameID++;
+        int gameID = nextGameID++;
         storedGames.put(gameID, new GameData(gameID, null, null, gameName, new chess.ChessGame()));
         return gameID;
     }
