@@ -21,8 +21,7 @@ public class GameService {
     public int createGame(String authToken, String gameName) throws DataAccessException {
         if (authDAO.getAuth(authToken) == null) {
             throw new DataAccessException("Error: Unauthorized");
-        }
-        if (gameName == null) {
+        } else if (gameName == null) {
             throw new DataAccessException("Error: Bad Request");
         }
         return gameDAO.createGame(gameName);
