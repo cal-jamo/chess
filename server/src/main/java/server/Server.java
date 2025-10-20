@@ -61,7 +61,12 @@ public class Server {
 
         // endpoint for delete method to logout a user
         javalin.delete("/session", (req) -> {
-
+            try {
+                AuthData authData = new Gson().fromJson(req.body(), AuthData.class);
+                userService.logoutUser(authData.authToken());
+            } catch (DataAccessException e) {
+                req.status(403).json(java.util.Map.of("message", e.getMessage()));
+            }
         });
 
 

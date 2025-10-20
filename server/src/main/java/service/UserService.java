@@ -26,11 +26,18 @@ public class UserService {
         return authDAO.createAuth(user.username());
     }
 
-    public AuthData loginUser(AuthData authData) throws DataAccessException{
-
+    public AuthData loginUser(UserData user) throws DataAccessException{
+        if (user.username() == null || user.password() == null) {
+            throw new DataAccessException("Error: Username and password cannot be null");
+        }
+        UserData existingUser = userDAO.getUser(user.username());
+        if (existingUser == null || !user.password().equals(existingUser.password())) {
+            throw new DataAccessException("Error: Username and password does not match");
+        }
+        return authDAO.createAuth(user.username());
     }
 
-    public AuthData logoutUser(AuthData authData) throws DataAccessException{
-
+    public void logoutUser(String AuthToken) throws DataAccessException{
+        authDAO.deleteAuth(AuthToken);
     }
 }
