@@ -1,5 +1,7 @@
 package service;
 import dataaccess.*;
+import jdk.jshell.spi.ExecutionControl;
+import kotlin.NotImplementedError;
 import model.GameData;
 
 import javax.xml.crypto.Data;
@@ -17,12 +19,15 @@ public class GameService {
 
     // take authToken and gameName as parameters, and create and store the game data
     public int createGame(String authToken, String gameName) throws DataAccessException {
-
+        return 0;
     }
 
     // take authToken as a param and if auth token is valid return the list of games stored in memory
     public Collection<GameData> listGames(String authToken) throws DataAccessException {
-
+        if (authToken == null) {
+            throw new DataAccessException("Error: Unauthorized access");
+        }
+        return gameDAO.listGames();
     }
 
 

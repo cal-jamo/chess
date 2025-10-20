@@ -4,10 +4,13 @@ import com.google.gson.Gson;
 import dataaccess.*;
 import io.javalin.*;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
+import service.GameService;
 import service.ResetService;
 import service.UserService;
 
+import java.util.Collection;
 import java.util.Map;
 
 import static com.fasterxml.jackson.databind.type.LogicalType.Map;
@@ -25,6 +28,7 @@ public class Server {
 
         ResetService resetService = new ResetService(userDAO, authDAO, gameDAO);
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
+        GameService gameService = new GameService(authDAO, gameDAO);
 
         // Register your endpoints and exception handlers here.
         javalin.delete("/db", (req) -> {
@@ -59,10 +63,8 @@ public class Server {
             try {
                 var userData = new Gson().fromJson(req.body(), UserData.class);
                 var authSession = userService.loginUser(userData);
-                System.out.print(authSession);
                 req.status(200).json(authSession);
             } catch (DataAccessException e) {
-                System.out.print(e.getMessage());
                 if (e.getMessage().equals("Error: Username and Password cannot be null")) {
                     req.status(400).json(java.util.Map.of("message", e.getMessage()));
                 } else if (e.getMessage().equals("Error: Username and password does not match")) {
@@ -79,12 +81,29 @@ public class Server {
             try {
                 String authToken = req.header("authorization");
                 userService.logoutUser(authToken);
+                req.status(200);
             } catch (DataAccessException e) {
                 if (e.getMessage().equals("Error: unauthorized")) {
                     req.status(401).json(java.util.Map.of("message", e.getMessage()));
                 } else {
                     req.status(500).json(java.util.Map.of("message", String.format("Error: %s", e.getMessage())));
                 }
+            }
+        });
+
+        // endpoint to list all games stored in memory
+        javalin.get("/game", (req) -> {
+            try {
+                String authToken = req.header("authorization");
+                Collection<GameData> listOfGames = gameService.listGames(authToken);
+                req.status(200).json(java.util.Map.of("games", listOfGames));
+            } catch (DataAccessException e) {
+                if (e.getMessage().equals("Error: unauthorized")) {
+                    req.status(401).json(java.util.Map.of("message", e.getMessage()));
+                } else {
+                    req.status(500).json(java.util.Map.of("message", e.getMessage()));
+                }
+
             }
         });
 
