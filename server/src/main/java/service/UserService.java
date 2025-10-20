@@ -28,7 +28,7 @@ public class UserService {
 
     public AuthData loginUser(UserData userData) throws DataAccessException{
         if (userData.username() == null || userData.password() == null) {
-            throw new DataAccessException("Error: Username and password cannot be null");
+            throw new DataAccessException("Error: Username and Password cannot be null");
         }
         UserData existingUser = userDAO.getUser(userData.username());
         if (existingUser == null || !userData.password().equals(existingUser.password())) {
