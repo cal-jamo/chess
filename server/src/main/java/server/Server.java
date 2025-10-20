@@ -37,6 +37,7 @@ public class Server {
         }
         );
 
+        // user endpoint for registering a user
         javalin.post("/user", (req) -> {
             try {
                 UserData userData = new Gson().fromJson(req.body(), UserData.class);
