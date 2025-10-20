@@ -62,10 +62,14 @@ public class Server {
         // endpoint for delete method to logout a user
         javalin.delete("/session", (req) -> {
             try {
-                AuthData authData = new Gson().fromJson(req.body(), AuthData.class);
-                userService.logoutUser(authData.authToken());
+                String authToken = req.header("authorization");
+                userService.logoutUser(authToken);
             } catch (DataAccessException e) {
-                req.status(403).json(java.util.Map.of("message", e.getMessage()));
+                if (e.getMessage().equals("Error: unauthorized")) {
+                    req.status(401).json(java.util.Map.of("message", e.getMessage()));
+                } else {
+                    req.status(500).json(java.util.Map.of("message", String.format("Error: %s", e.getMessage())));
+                }
             }
         });
 
