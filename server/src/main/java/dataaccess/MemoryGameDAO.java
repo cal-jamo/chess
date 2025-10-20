@@ -8,7 +8,6 @@ public class MemoryGameDAO implements GameDAO {
     private final HashMap<Integer, GameData> storedGames = new HashMap<>();
     private int nextGameID = 1;
 
-    // function to create a game. A game name is passed in, an ID is created and assigned, and a new chess game is initialized
     @Override
     public int createGame(String gameName) {
         int gameID = nextGameID++;
@@ -16,7 +15,6 @@ public class MemoryGameDAO implements GameDAO {
         return gameID;
     }
 
-    // getGame finds a certain game in storedGames at the gameID passed in.
     @Override
     public GameData getGame(int gameID) {
         return storedGames.get(gameID);
@@ -27,7 +25,6 @@ public class MemoryGameDAO implements GameDAO {
         return storedGames.values();
     }
 
-    // this takes in a gameID so we can find the game in storedGames and updates it with new game data
     @Override
     public void updateGame(int gameID, GameData game) throws DataAccessException {
         if (!storedGames.containsKey(gameID)) {
