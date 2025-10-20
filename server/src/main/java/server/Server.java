@@ -56,7 +56,22 @@ public class Server {
 
         // endpoint for post method to log in a user
         javalin.post("/session", (req) -> {
+            try {
+                var userData = new Gson().fromJson(req.body(), UserData.class);
+                var authSession = userService.loginUser(userData);
+                req.status(200).json(authSession);
+            } catch (DataAccessException e) {
+                if (e.getMessage().equals("Error: Username and password cannot be null")) {
+                    req.status(400).json(java.util.Map.of("message", e.getMessage()));
+                }
+                if (e.getMessage().equals("Error: Username and password does not match")) {
+                    req.status(401).json(java.util.Map.of("message", e.getMessage()));
+                }
+                else {
+                    req.status(500).json(java.util.Map.of("message", e.getMessage()));
+                }
 
+            }
         });
 
         // endpoint for delete method to logout a user
