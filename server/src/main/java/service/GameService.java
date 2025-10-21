@@ -2,7 +2,9 @@ package service;
 import dataaccess.*;
 import jdk.jshell.spi.ExecutionControl;
 import kotlin.NotImplementedError;
+import model.AuthData;
 import model.GameData;
+import model.JoinRequest;
 
 import javax.xml.crypto.Data;
 import java.util.Collection;
@@ -33,6 +35,31 @@ public class GameService {
             throw new DataAccessException("Error: Unauthorized access");
         }
         return gameDAO.listGames();
+    }
+
+    // join game is a method that will take
+    public void joinGame(String authToken, JoinRequest request) throws DataAccessException {
+        AuthData authData = authDAO.getAuth(authToken);
+        if (authData.authToken() == null) {
+            throw new DataAccessException("Error: Unauthorized");
+        }
+        if (request == null) {
+            throw new DataAccessException("Error: Bad Request");
+        }
+        GameData gameData = gameDAO.getGame(request.gameId());
+        String playerColor = request.playerColor();
+        if(playerColor.equals("WHITE")) {
+            if (gameData.whiteUsername() != null) {
+                throw new DataAccessException("Error: Color already taken");
+            }
+            gameData = new GameData(gameData.gameID(), authData.username(), gameData.blackUsername(), gameData.gameName(), gameData.game());
+        } else if (playerColor.equals("BLACK")) {
+            if (gameData.blackUsername() != null) {
+                throw new DataAccessException("Error: Color already taken");
+            }
+            gameData = new GameData(gameData.gameID(), gameData.whiteUsername(), authData.username(), gameData.gameName(), gameData.game());
+        }
+        gameDAO.updateGame(gameData.gameID(), gameData);
     }
 
 
