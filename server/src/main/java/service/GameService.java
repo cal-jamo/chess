@@ -43,9 +43,10 @@ public class GameService {
         if (authData.authToken() == null) {
             throw new DataAccessException("Error: Unauthorized");
         }
-        if (request == null) {
+        if (request.gameId() == 0 || request.playerColor() == null) {
             throw new DataAccessException("Error: Bad Request");
         }
+        System.out.print(request);
         GameData gameData = gameDAO.getGame(request.gameId());
         String playerColor = request.playerColor();
         if(playerColor.equals("WHITE")) {

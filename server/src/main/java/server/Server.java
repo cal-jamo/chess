@@ -1,5 +1,4 @@
 package server;
-
 import com.google.gson.Gson;
 import dataaccess.*;
 import io.javalin.*;
@@ -9,11 +8,8 @@ import model.UserData;
 import service.GameService;
 import service.ResetService;
 import service.UserService;
-
+import model.JoinRequest;
 import java.util.Collection;
-import java.util.Map;
-
-import static com.fasterxml.jackson.databind.type.LogicalType.Map;
 
 public class Server {
 
@@ -126,6 +122,27 @@ public class Server {
 
             }
         });
+
+        javalin.put("/game", (req) -> {
+            try {
+                String authToken = req.header("authorization");
+                var joinRequest = new Gson().fromJson(req.body(), JoinRequest.class);
+                gameService.joinGame(authToken, joinRequest);
+                req.status(200);
+            } catch (DataAccessException e) {
+                if (e.getMessage().equals("Error: Bad Request")) {
+                    req.status(400).json(java.util.Map.of("message", e.getMessage()));
+                } else if (e.getMessage().equals("Error: Unauthorized")) {
+                    req.status(401).json(java.util.Map.of("message", e.getMessage()));
+                } else if (e.getMessage().equals("Error: Color already taken")) {
+                    req.status(403).json(java.util.Map.of("message", e.getMessage()));
+                } else {
+                    req.status(500).json(java.util.Map.of("message", e.getMessage()));
+                }
+            }
+        });
+
+
 
 
     }
