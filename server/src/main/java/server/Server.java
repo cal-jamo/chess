@@ -126,11 +126,12 @@ public class Server {
         javalin.put("/game", (req) -> {
             try {
                 String authToken = req.header("authorization");
-                var joinRequest = new Gson().fromJson(req.body(), JoinRequest.class);
-                gameService.joinGame(authToken, joinRequest);
+                System.out.println(req.body());
+                var joinGameRequest = new Gson().fromJson(req.body(), JoinRequest.class);
+                System.out.println(joinGameRequest);
+                gameService.joinGame(authToken, joinGameRequest);
                 req.status(200);
             } catch (DataAccessException e) {
-                System.out.print(e.getMessage());
                 if (e.getMessage().equals("Error: Bad Request")) {
                     req.status(400).json(java.util.Map.of("message", e.getMessage()));
                 } else if (e.getMessage().equals("Error: Unauthorized")) {

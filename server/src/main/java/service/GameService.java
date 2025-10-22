@@ -41,15 +41,16 @@ public class GameService {
     public void joinGame(String authToken, JoinRequest request) throws DataAccessException {
         System.out.print("Request: " + request);
         AuthData authData = authDAO.getAuth(authToken);
-        GameData gameData = gameDAO.getGame(request.gameId());
         if (authData.authToken() == null) {
             throw new DataAccessException("Error: Unauthorized");
         }
-        if (request.gameId() == 0 || request.playerColor() == null) {
+
+        GameData gameData = gameDAO.getGame(request.gameID());
+        String playerColor = request.playerColor();
+        if (gameData == null || playerColor == null) {
             throw new DataAccessException("Error: Bad Request");
         }
 
-        String playerColor = request.playerColor();
         if(playerColor.equals("WHITE")) {
             if (gameData.whiteUsername() != null) {
                 throw new DataAccessException("Error: Color already taken");
