@@ -126,9 +126,7 @@ public class Server {
         javalin.put("/game", (req) -> {
             try {
                 String authToken = req.header("authorization");
-                System.out.println(req.body());
                 var joinGameRequest = new Gson().fromJson(req.body(), JoinRequest.class);
-                System.out.println(joinGameRequest);
                 gameService.joinGame(authToken, joinGameRequest);
                 req.status(200);
             } catch (DataAccessException e) {

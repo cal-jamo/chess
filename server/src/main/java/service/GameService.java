@@ -1,12 +1,8 @@
 package service;
 import dataaccess.*;
-import jdk.jshell.spi.ExecutionControl;
-import kotlin.NotImplementedError;
 import model.AuthData;
 import model.GameData;
 import model.JoinRequest;
-
-import javax.xml.crypto.Data;
 import java.util.Collection;
 
 
@@ -39,7 +35,6 @@ public class GameService {
 
     // join game is a method that will take
     public void joinGame(String authToken, JoinRequest request) throws DataAccessException {
-        System.out.print("Request: " + request);
         AuthData authData = authDAO.getAuth(authToken);
         if (authData.authToken() == null) {
             throw new DataAccessException("Error: Unauthorized");
