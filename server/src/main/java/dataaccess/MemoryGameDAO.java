@@ -9,8 +9,10 @@ public class MemoryGameDAO implements GameDAO {
 
     @Override
     public int createGame(String gameName) {
-        int gameID = nextGameID++;
+        int gameID = nextGameID;
+        System.out.println("Creating game " + gameID + "...");
         storedGames.put(gameID, new GameData(gameID, null, null, gameName, new chess.ChessGame()));
+        nextGameID += 1;
         return gameID;
     }
 
