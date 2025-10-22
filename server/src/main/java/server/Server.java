@@ -94,7 +94,7 @@ public class Server {
                 Collection<GameData> listOfGames = gameService.listGames(authToken);
                 req.status(200).json(java.util.Map.of("games", listOfGames));
             } catch (DataAccessException e) {
-                if (e.getMessage().equals("Error: unauthorized")) {
+                if (e.getMessage().equals("Error: Unauthorized")) {
                     req.status(401).json(java.util.Map.of("message", e.getMessage()));
                 } else {
                     req.status(500).json(java.util.Map.of("message", e.getMessage()));
@@ -135,7 +135,7 @@ public class Server {
                     System.out.print(req.status());
                 } else if (e.getMessage().equals("Error: Unauthorized")) {
                     req.status(401).json(java.util.Map.of("message", e.getMessage()));
-                } else if (e.getMessage().equals("Error: Color already taken")) {
+                } else if (e.getMessage().equals("Error: Color Already Taken")) {
                     req.status(403).json(java.util.Map.of("message", e.getMessage()));
                 } else {
                     req.status(500).json(java.util.Map.of("message", e.getMessage()));

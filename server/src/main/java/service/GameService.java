@@ -4,6 +4,8 @@ import model.AuthData;
 import model.GameData;
 import model.JoinRequest;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class GameService {
@@ -14,13 +16,18 @@ public class GameService {
         this.authDAO = authDAO;
         this.gameDAO = gameDAO;
     }
+    private static final Map<Integer, String> ERROR_MAP = Map.of(
+            400, "Error: Bad Request",
+            401, "Error: Unauthorized",
+            403, "Error: Color Already Taken"
+    );
 
     // take authToken and gameName as parameters, and create and store the game data
     public int createGame(String authToken, String gameName) throws DataAccessException {
         if (authDAO.getAuth(authToken) == null) {
-            throw new DataAccessException("Error: Unauthorized");
+            throw new DataAccessException(ERROR_MAP.get(401));
         } else if (gameName == null) {
-            throw new DataAccessException("Error: Bad Request");
+            throw new DataAccessException(ERROR_MAP.get(400));
         }
         return gameDAO.createGame(gameName);
     }
@@ -28,7 +35,7 @@ public class GameService {
     // take authToken as a param and if auth token is valid return the list of games stored in memory
     public Collection<GameData> listGames(String authToken) throws DataAccessException {
         if (authToken == null) {
-            throw new DataAccessException("Error: Unauthorized access");
+            throw new DataAccessException(ERROR_MAP.get(401));
         }
         return gameDAO.listGames();
     }
@@ -37,23 +44,28 @@ public class GameService {
     public void joinGame(String authToken, JoinRequest request) throws DataAccessException {
         AuthData authData = authDAO.getAuth(authToken);
         if (authData == null) {
-            throw new DataAccessException("Error: Unauthorized");
+            throw new DataAccessException(ERROR_MAP.get(401));
+        }
+
+        String playerColor = request.playerColor();
+        System.out.print(playerColor);
+        if (playerColor == null || (!playerColor.equals("WHITE") && !playerColor.equals("BLACK"))) {
+            throw new DataAccessException(ERROR_MAP.get(400));
         }
 
         GameData gameData = gameDAO.getGame(request.gameID());
-        String playerColor = request.playerColor();
-        if (gameData == null || playerColor == null) {
-            throw new DataAccessException("Error: Bad Request");
+        if (gameData == null) {
+            throw new DataAccessException(ERROR_MAP.get(400));
         }
 
         if(playerColor.equals("WHITE")) {
             if (gameData.whiteUsername() != null) {
-                throw new DataAccessException("Error: Color already taken");
+                throw new DataAccessException(ERROR_MAP.get(403));
             }
             gameData = new GameData(gameData.gameID(), authData.username(), gameData.blackUsername(), gameData.gameName());
         } else if (playerColor.equals("BLACK")) {
             if (gameData.blackUsername() != null) {
-                throw new DataAccessException("Error: Color already taken");
+                throw new DataAccessException(ERROR_MAP.get(403));
             }
             gameData = new GameData(gameData.gameID(), gameData.whiteUsername(), authData.username(), gameData.gameName());
         }
