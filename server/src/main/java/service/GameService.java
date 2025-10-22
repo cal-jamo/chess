@@ -55,12 +55,12 @@ public class GameService {
             if (gameData.whiteUsername() != null) {
                 throw new DataAccessException("Error: Color already taken");
             }
-            gameData = new GameData(gameData.gameID(), authData.username(), gameData.blackUsername(), gameData.gameName(), gameData.game());
+            gameData = new GameData(gameData.gameID(), authData.username(), gameData.blackUsername(), gameData.gameName());
         } else if (playerColor.equals("BLACK")) {
             if (gameData.blackUsername() != null) {
                 throw new DataAccessException("Error: Color already taken");
             }
-            gameData = new GameData(gameData.gameID(), gameData.whiteUsername(), authData.username(), gameData.gameName(), gameData.game());
+            gameData = new GameData(gameData.gameID(), gameData.whiteUsername(), authData.username(), gameData.gameName());
         }
         gameDAO.updateGame(gameData.gameID(), gameData);
     }
