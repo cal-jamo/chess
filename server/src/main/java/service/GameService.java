@@ -36,7 +36,7 @@ public class GameService {
     // join game is a method that will take
     public void joinGame(String authToken, JoinRequest request) throws DataAccessException {
         AuthData authData = authDAO.getAuth(authToken);
-        if (authData.authToken() == null) {
+        if (authData == null) {
             throw new DataAccessException("Error: Unauthorized");
         }
 

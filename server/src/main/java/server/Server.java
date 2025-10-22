@@ -132,6 +132,7 @@ public class Server {
             } catch (DataAccessException e) {
                 if (e.getMessage().equals("Error: Bad Request")) {
                     req.status(400).json(java.util.Map.of("message", e.getMessage()));
+                    System.out.print(req.status());
                 } else if (e.getMessage().equals("Error: Unauthorized")) {
                     req.status(401).json(java.util.Map.of("message", e.getMessage()));
                 } else if (e.getMessage().equals("Error: Color already taken")) {
