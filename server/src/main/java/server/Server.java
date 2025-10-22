@@ -79,7 +79,7 @@ public class Server {
                 userService.logoutUser(authToken);
                 req.status(200);
             } catch (DataAccessException e) {
-                if (e.getMessage().equals("Error: unauthorized")) {
+                if (e.getMessage().equals("Error: Unauthorized")) {
                     req.status(401).json(java.util.Map.of("message", e.getMessage()));
                 } else {
                     req.status(500).json(java.util.Map.of("message", String.format("Error: %s", e.getMessage())));
@@ -132,7 +132,6 @@ public class Server {
             } catch (DataAccessException e) {
                 if (e.getMessage().equals("Error: Bad Request")) {
                     req.status(400).json(java.util.Map.of("message", e.getMessage()));
-                    System.out.print(req.status());
                 } else if (e.getMessage().equals("Error: Unauthorized")) {
                     req.status(401).json(java.util.Map.of("message", e.getMessage()));
                 } else if (e.getMessage().equals("Error: Color Already Taken")) {

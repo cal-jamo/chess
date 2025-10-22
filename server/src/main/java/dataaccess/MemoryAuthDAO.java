@@ -26,7 +26,7 @@ public class MemoryAuthDAO implements AuthDAO {
         Object deletedData = authTokens.remove(authToken);
 
         if (deletedData == null) {
-            throw new DataAccessException("Error: unauthorized");
+            throw new DataAccessException("Error: Unauthorized");
         }
     }
 

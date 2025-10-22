@@ -34,13 +34,13 @@ public class GameService {
 
     // take authToken as a param and if auth token is valid return the list of games stored in memory
     public Collection<GameData> listGames(String authToken) throws DataAccessException {
-        if (authToken == null) {
+        AuthData authData = authDAO.getAuth(authToken);
+        if (authData == null) {
             throw new DataAccessException(ERROR_MAP.get(401));
         }
         return gameDAO.listGames();
     }
 
-    // join game is a method that will take
     public void joinGame(String authToken, JoinRequest request) throws DataAccessException {
         AuthData authData = authDAO.getAuth(authToken);
         if (authData == null) {
@@ -48,7 +48,6 @@ public class GameService {
         }
 
         String playerColor = request.playerColor();
-        System.out.print(playerColor);
         if (playerColor == null || (!playerColor.equals("WHITE") && !playerColor.equals("BLACK"))) {
             throw new DataAccessException(ERROR_MAP.get(400));
         }
