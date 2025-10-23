@@ -29,9 +29,7 @@ public class Server {
             } catch (DataAccessException e){
                 req.status(500);
             }
-        }
-        );
-        // user endpoint for registering a user
+        });
         javalin.post("/user", (req) -> {
             try {
                 UserData userData = new Gson().fromJson(req.body(), UserData.class);
@@ -47,7 +45,6 @@ public class Server {
                 }
             }
         });
-        // endpoint for post method to log in a user
         javalin.post("/session", (req) -> {
             try {
                 var userData = new Gson().fromJson(req.body(), UserData.class);
@@ -64,7 +61,6 @@ public class Server {
                 }
             }
         });
-        // endpoint for delete method to logout a user
         javalin.delete("/session", (req) -> {
             try {
                 String authToken = req.header("authorization");
@@ -78,7 +74,6 @@ public class Server {
                 }
             }
         });
-        // endpoint to list all games stored in memory
         javalin.get("/game", (req) -> {
             try {
                 String authToken = req.header("authorization");
@@ -93,7 +88,6 @@ public class Server {
 
             }
         });
-        // endpoint to create a new game given a valid auth token and game name
         javalin.post("/game", (req) -> {
             try {
                 String authToken = req.header("authorization");
@@ -109,7 +103,6 @@ public class Server {
                 } else {
                     req.status(500).json(java.util.Map.of("message", e.getMessage()));
                 }
-
             }
         });
         javalin.put("/game", (req) -> {
