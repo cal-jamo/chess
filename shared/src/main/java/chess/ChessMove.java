@@ -50,8 +50,12 @@ public class ChessMove {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ChessMove)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ChessMove)) {
+            return false;
+        }
         ChessMove other = (ChessMove) o;
         return this.startPosition.equals(other.startPosition) &&
                 this.endPosition.equals(other.endPosition) &&

@@ -133,7 +133,9 @@ public class PieceMovesCalculator {
                 row += dir[0];
                 col += dir[1];
                 ChessPosition endPosition = new ChessPosition(row, col);
-                if (!isWithinBoard(endPosition)) break;
+                if (!isWithinBoard(endPosition)) {
+                    break;
+                }
                 ChessPiece occupyingPiece = board.getPiece(endPosition);
                 if (occupyingPiece == null) {
                     moves.add(new ChessMove(position, endPosition, null));

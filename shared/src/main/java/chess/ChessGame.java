@@ -143,7 +143,9 @@ public class ChessGame {
                     break;
                 }
             }
-            if (kingPosition != null) break;
+            if (kingPosition != null) {
+                break;
+            }
         }
 
         if (kingPosition == null) {
