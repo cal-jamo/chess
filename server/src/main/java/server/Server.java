@@ -112,14 +112,15 @@ public class Server {
                 gameService.joinGame(authToken, joinGameRequest);
                 req.status(200);
             } catch (DataAccessException e) {
-                if (e.getMessage().equals("Error: Bad Request")) {
-                    req.status(400).json(java.util.Map.of("message", e.getMessage()));
-                } else if (e.getMessage().equals("Error: Unauthorized")) {
-                    req.status(401).json(java.util.Map.of("message", e.getMessage()));
-                } else if (e.getMessage().equals("Error: Color Already Taken")) {
-                    req.status(403).json(java.util.Map.of("message", e.getMessage()));
-                } else {
-                    req.status(500).json(java.util.Map.of("message", e.getMessage()));
+                switch (e.getMessage()) {
+                    case "Error: Bad Request" ->
+                            req.status(400).json(java.util.Map.of("message", e.getMessage()));
+                    case "Error: Unauthorized" ->
+                            req.status(401).json(java.util.Map.of("message", e.getMessage()));
+                    case "Error: Color Already Taken" ->
+                            req.status(403).json(java.util.Map.of("message", e.getMessage()));
+                    default ->
+                            req.status(500).json(java.util.Map.of("message", e.getMessage()));
                 }
             }
         });
