@@ -25,9 +25,7 @@ public class Server {
             try {
                 resetService.resetApplication();
                 req.status(200);
-            } catch (DataAccessException e){
-                req.status(500);
-            }
+            } catch (DataAccessException e){req.status(500);}
         });
         javalin.post("/user", (req) -> {
             try {
@@ -66,9 +64,7 @@ public class Server {
             } catch (DataAccessException e) {
                 if (e.getMessage().equals("Error: Unauthorized")) {
                     req.status(401).json(java.util.Map.of("message", e.getMessage()));
-                } else {
-                    req.status(500).json(java.util.Map.of("message", String.format("Error: %s", e.getMessage())));
-                }}
+                } else {req.status(500).json(java.util.Map.of("message", String.format("Error: %s", e.getMessage())));}}
         });
         javalin.get("/game", (req) -> {
             try {
@@ -78,9 +74,7 @@ public class Server {
             } catch (DataAccessException e) {
                 if (e.getMessage().equals("Error: Unauthorized")) {
                     req.status(401).json(java.util.Map.of("message", e.getMessage()));
-                } else {
-                    req.status(500).json(java.util.Map.of("message", e.getMessage()));
-                }}
+                } else {req.status(500).json(java.util.Map.of("message", e.getMessage()));}}
         });
         javalin.post("/game", (req) -> {
             try {
@@ -94,9 +88,7 @@ public class Server {
                     req.status(400).json(java.util.Map.of("message", e.getMessage()));
                 } else if (e.getMessage().equals("Error: Unauthorized")) {
                     req.status(401).json(java.util.Map.of("message", e.getMessage()));
-                } else {
-                    req.status(500).json(java.util.Map.of("message", e.getMessage()));
-                }}
+                } else { req.status(500).json(java.util.Map.of("message", e.getMessage()));}}
         });
         javalin.put("/game", (req) -> {
             try {
