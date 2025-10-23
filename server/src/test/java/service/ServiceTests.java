@@ -47,8 +47,8 @@ public class ServiceTests {
         AuthData authData = userService.registerUser(userToRegister);
         Assertions.assertNotNull(authData);
         Assertions.assertEquals("cwjamo", authData.username());
-        UserData SecondUserToRegister = new UserData("cwjamo", "halogamer", "cwjamo@byu.edu");
-        Assertions.assertThrows(DataAccessException.class, () -> {userService.registerUser(SecondUserToRegister);});
+        UserData secondUserToRegister = new UserData("cwjamo", "halogamer", "cwjamo@byu.edu");
+        Assertions.assertThrows(DataAccessException.class, () -> {userService.registerUser(secondUserToRegister);});
     }
     @Test
     @Order(3)

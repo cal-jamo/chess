@@ -37,7 +37,7 @@ public class UserService {
         return authDAO.createAuth(userData.username());
     }
 
-    public void logoutUser(String AuthToken) throws DataAccessException{
-        authDAO.deleteAuth(AuthToken);
+    public void logoutUser(String authToken) throws DataAccessException{
+        authDAO.deleteAuth(authToken);
     }
 }
