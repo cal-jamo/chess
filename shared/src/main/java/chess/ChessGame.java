@@ -157,7 +157,7 @@ public class ChessGame {
             for (int c = 1; c <= 8; c++) {
                 ChessPosition currentPos = new ChessPosition(r, c);
                 ChessPiece piece = board.getPiece(currentPos);
-                if (canTakeKing(board, piece, opponentColor, currentPos, kingPosition)) {
+                if (takeKing(board, piece, opponentColor, currentPos, kingPosition)) {
                     return true;
                 }
             }
@@ -166,11 +166,11 @@ public class ChessGame {
         return false;
     }
 
-    private static boolean canTakeKing(ChessBoard board, ChessPiece piece, TeamColor opponentColor, ChessPosition currentPos, ChessPosition kingPosition) {
-        if (piece != null && piece.getTeamColor() == opponentColor) {
-            Collection<ChessMove> moves = PieceMovesCalculator.calculateMoves(board, currentPos);
+    private static boolean takeKing(ChessBoard brd, ChessPiece piece, TeamColor opCol, ChessPosition curPos, ChessPosition kingPos) {
+        if (piece != null && piece.getTeamColor() == opCol) {
+            Collection<ChessMove> moves = PieceMovesCalculator.calculateMoves(brd, curPos);
             for (ChessMove move : moves) {
-                if (move.getEndPosition().equals(kingPosition)) {
+                if (move.getEndPosition().equals(kingPos)) {
                     return true;
                 }
             }
