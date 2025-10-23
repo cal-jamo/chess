@@ -2,6 +2,7 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.*;
 import io.javalin.*;
+import io.javalin.json.JavalinGson;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -11,10 +12,14 @@ import service.UserService;
 import model.JoinRequest;
 import java.util.Collection;
 
+
 public class Server {
     private final Javalin javalin;
     public Server() {
-        javalin = Javalin.create(config -> config.staticFiles.add("web"));
+        javalin = Javalin.create(config -> {
+            config.staticFiles.add("web");
+            config.jsonMapper(new JavalinGson());
+        });
         AuthDAO authDAO = new MemoryAuthDAO();
         UserDAO userDAO = new MemoryUserDAO();
         GameDAO gameDAO = new MemoryGameDAO();
@@ -37,9 +42,7 @@ public class Server {
                     req.status(403).json(java.util.Map.of("message", e.getMessage()));
                 } else if (e.getMessage().equals("Error: Username and password cannot be null")) {
                     req.status(400).json(java.util.Map.of("message", e.getMessage()));
-                } else {
-                    req.status(500).json(java.util.Map.of("message", e.getMessage()));
-                }}
+                } else {req.status(500).json(java.util.Map.of("message", e.getMessage()));}}
         });
         javalin.post("/session", (req) -> {
             try {
@@ -52,9 +55,7 @@ public class Server {
                 } else if (e.getMessage().equals("Error: Username and password does not match")) {
                     req.status(401).json(java.util.Map.of("message", e.getMessage()));
                 }
-                else {
-                    req.status(500).json(java.util.Map.of("message", e.getMessage()));
-                }}
+                else {req.status(500).json(java.util.Map.of("message", e.getMessage()));}}
         });
         javalin.delete("/session", (req) -> {
             try {
