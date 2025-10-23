@@ -12,20 +12,15 @@ import model.JoinRequest;
 import java.util.Collection;
 
 public class Server {
-
     private final Javalin javalin;
-
     public Server() {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
-
         AuthDAO authDAO = new MemoryAuthDAO();
         UserDAO userDAO = new MemoryUserDAO();
         GameDAO gameDAO = new MemoryGameDAO();
-
         ResetService resetService = new ResetService(userDAO, authDAO, gameDAO);
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
         GameService gameService = new GameService(authDAO, gameDAO);
-
         // Register your endpoints and exception handlers here.
         javalin.delete("/db", (req) -> {
             try {
@@ -36,7 +31,6 @@ public class Server {
             }
         }
         );
-
         // user endpoint for registering a user
         javalin.post("/user", (req) -> {
             try {
@@ -53,7 +47,6 @@ public class Server {
                 }
             }
         });
-
         // endpoint for post method to log in a user
         javalin.post("/session", (req) -> {
             try {
@@ -71,7 +64,6 @@ public class Server {
                 }
             }
         });
-
         // endpoint for delete method to logout a user
         javalin.delete("/session", (req) -> {
             try {
@@ -86,7 +78,6 @@ public class Server {
                 }
             }
         });
-
         // endpoint to list all games stored in memory
         javalin.get("/game", (req) -> {
             try {
@@ -102,7 +93,6 @@ public class Server {
 
             }
         });
-
         // endpoint to create a new game given a valid auth token and game name
         javalin.post("/game", (req) -> {
             try {
@@ -122,7 +112,6 @@ public class Server {
 
             }
         });
-
         javalin.put("/game", (req) -> {
             try {
                 String authToken = req.header("authorization");
@@ -141,17 +130,11 @@ public class Server {
                 }
             }
         });
-
-
-
-
     }
-
     public int run(int desiredPort) {
         javalin.start(desiredPort);
         return javalin.port();
     }
-
     public void stop() {
         javalin.stop();
     }

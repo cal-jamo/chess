@@ -81,6 +81,10 @@ public class PieceMovesCalculator {
         Collection<ChessMove> moves = new HashSet<>();
         ChessPiece piece = board.getPiece(position);
         int [][] direction = {{2,1},{2,-1},{-2,1},{-2,-1},{1,2},{1,-2},{-1,2},{-1,-2}};
+        return getChessMoves(board, position, moves, piece, direction);
+    }
+
+    private static Collection<ChessMove> getChessMoves(ChessBoard board, ChessPosition position, Collection<ChessMove> moves, ChessPiece piece, int[][] direction) {
         for (int[] dir : direction) {
             int endRow = position.getRow() + dir[0];
             int endCol = position.getColumn() + dir[1];
@@ -99,18 +103,7 @@ public class PieceMovesCalculator {
         Collection<ChessMove> moves = new HashSet<>();
         ChessPiece piece = board.getPiece(position);
         int [][] direction = {{1,0},{-1,0},{0,1},{0,-1},{1,1},{1,-1},{-1,1},{-1,-1}};
-        for (int[] dir : direction) {
-            int endRow = position.getRow() + dir[0];
-            int endCol = position.getColumn() + dir[1];
-            ChessPosition endPosition = new ChessPosition(endRow, endCol);
-            if (isWithinBoard(endPosition)) {
-                ChessPiece occupyingPiece = board.getPiece(endPosition);
-                if (occupyingPiece == null || occupyingPiece.getTeamColor() != piece.getTeamColor()) {
-                    moves.add(new ChessMove(position, endPosition, null));
-                }
-            }
-        }
-        return moves;
+        return getChessMoves(board, position, moves, piece, direction);
     }
 
     private static Collection<ChessMove> queenMovesCalculator(ChessBoard board, ChessPosition position) {
