@@ -21,7 +21,6 @@ public class Server {
         ResetService resetService = new ResetService(userDAO, authDAO, gameDAO);
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
         GameService gameService = new GameService(authDAO, gameDAO);
-        // Register your endpoints and exception handlers here.
         javalin.delete("/db", (req) -> {
             try {
                 resetService.resetApplication();
@@ -42,8 +41,7 @@ public class Server {
                     req.status(400).json(java.util.Map.of("message", e.getMessage()));
                 } else {
                     req.status(500).json(java.util.Map.of("message", e.getMessage()));
-                }
-            }
+                }}
         });
         javalin.post("/session", (req) -> {
             try {
@@ -58,8 +56,7 @@ public class Server {
                 }
                 else {
                     req.status(500).json(java.util.Map.of("message", e.getMessage()));
-                }
-            }
+                }}
         });
         javalin.delete("/session", (req) -> {
             try {
@@ -71,8 +68,7 @@ public class Server {
                     req.status(401).json(java.util.Map.of("message", e.getMessage()));
                 } else {
                     req.status(500).json(java.util.Map.of("message", String.format("Error: %s", e.getMessage())));
-                }
-            }
+                }}
         });
         javalin.get("/game", (req) -> {
             try {
@@ -84,9 +80,7 @@ public class Server {
                     req.status(401).json(java.util.Map.of("message", e.getMessage()));
                 } else {
                     req.status(500).json(java.util.Map.of("message", e.getMessage()));
-                }
-
-            }
+                }}
         });
         javalin.post("/game", (req) -> {
             try {
@@ -102,8 +96,7 @@ public class Server {
                     req.status(401).json(java.util.Map.of("message", e.getMessage()));
                 } else {
                     req.status(500).json(java.util.Map.of("message", e.getMessage()));
-                }
-            }
+                }}
         });
         javalin.put("/game", (req) -> {
             try {
@@ -112,17 +105,15 @@ public class Server {
                 gameService.joinGame(authToken, joinGameRequest);
                 req.status(200);
             } catch (DataAccessException e) {
-                switch (e.getMessage()) {
-                    case "Error: Bad Request" ->
-                            req.status(400).json(java.util.Map.of("message", e.getMessage()));
-                    case "Error: Unauthorized" ->
-                            req.status(401).json(java.util.Map.of("message", e.getMessage()));
-                    case "Error: Color Already Taken" ->
-                            req.status(403).json(java.util.Map.of("message", e.getMessage()));
-                    default ->
-                            req.status(500).json(java.util.Map.of("message", e.getMessage()));
-                }
-            }
+                if (e.getMessage().equals("Error: Bad Request")) {
+                    req.status(400).json(java.util.Map.of("message", e.getMessage()));
+                } else if (e.getMessage().equals("Error: Unauthorized")) {
+                    req.status(401).json(java.util.Map.of("message", e.getMessage()));
+                } else if (e.getMessage().equals("Error: Color Already Taken")) {
+                    req.status(403).json(java.util.Map.of("message", e.getMessage()));
+                } else {
+                    req.status(500).json(java.util.Map.of("message", e.getMessage()));
+                }}
         });
     }
     public int run(int desiredPort) {
