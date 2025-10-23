@@ -12,16 +12,16 @@ public class PieceMovesCalculator {
         }
 
         return switch (piece.getPieceType()) {
-            case KING -> KingMovesCalculator(board, position);
-            case QUEEN -> QueenMovesCalculator(board, position);
-            case BISHOP -> BishopMovesCalculator(board, position);
-            case KNIGHT -> KnightMovesCalculator(board, position);
-            case ROOK -> RookMovesCalculator(board, position);
-            case PAWN -> PawnMovesCalculator(board, position);
+            case KING -> kingMovesCalculator(board, position);
+            case QUEEN -> queenMovesCalculator(board, position);
+            case BISHOP -> bishopMovesCalculator(board, position);
+            case KNIGHT -> knightMovesCalculator(board, position);
+            case ROOK -> rookMovesCalculator(board, position);
+            case PAWN -> pawnMovesCalculator(board, position);
         };
     }
 
-    private static Collection<ChessMove> PawnMovesCalculator(ChessBoard board, ChessPosition position) {
+    private static Collection<ChessMove> pawnMovesCalculator(ChessBoard board, ChessPosition position) {
         Collection<ChessMove> moves =new HashSet<>();
         ChessPiece piece = board.getPiece(position);
 
@@ -77,7 +77,7 @@ public class PieceMovesCalculator {
         moves.add(new ChessMove(position, endPosition, ChessPiece.PieceType.BISHOP));
     }
 
-    private static Collection<ChessMove> KnightMovesCalculator(ChessBoard board, ChessPosition position) {
+    private static Collection<ChessMove> knightMovesCalculator(ChessBoard board, ChessPosition position) {
         Collection<ChessMove> moves = new HashSet<>();
         ChessPiece piece = board.getPiece(position);
         int [][] direction = {{2,1},{2,-1},{-2,1},{-2,-1},{1,2},{1,-2},{-1,2},{-1,-2}};
@@ -95,7 +95,7 @@ public class PieceMovesCalculator {
         return moves;
     }
 
-    private static Collection<ChessMove> KingMovesCalculator(ChessBoard board, ChessPosition position) {
+    private static Collection<ChessMove> kingMovesCalculator(ChessBoard board, ChessPosition position) {
         Collection<ChessMove> moves = new HashSet<>();
         ChessPiece piece = board.getPiece(position);
         int [][] direction = {{1,0},{-1,0},{0,1},{0,-1},{1,1},{1,-1},{-1,1},{-1,-1}};
@@ -113,19 +113,19 @@ public class PieceMovesCalculator {
         return moves;
     }
 
-    private static Collection<ChessMove> QueenMovesCalculator(ChessBoard board, ChessPosition position) {
+    private static Collection<ChessMove> queenMovesCalculator(ChessBoard board, ChessPosition position) {
         Collection<ChessMove> moves = new HashSet<>();
-        moves.addAll(BishopMovesCalculator(board, position));
-        moves.addAll(RookMovesCalculator(board, position));
+        moves.addAll(bishopMovesCalculator(board, position));
+        moves.addAll(rookMovesCalculator(board, position));
         return moves;
     }
 
-    private static Collection<ChessMove> RookMovesCalculator(ChessBoard board, ChessPosition position) {
+    private static Collection<ChessMove> rookMovesCalculator(ChessBoard board, ChessPosition position) {
         int[][] direction = {{1,0},{-1,0},{0,1},{0,-1}};
         return calculateSlidingMoves(board, position, direction);
     }
 
-    private static Collection<ChessMove> BishopMovesCalculator(ChessBoard board, ChessPosition position) {
+    private static Collection<ChessMove> bishopMovesCalculator(ChessBoard board, ChessPosition position) {
         int[][] direction = {{1,1},{1,-1},{-1,1},{-1,-1}};
         return calculateSlidingMoves(board, position, direction);
     }
