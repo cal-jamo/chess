@@ -81,29 +81,29 @@ public class PieceMovesCalculator {
         Collection<ChessMove> moves = new HashSet<>();
         ChessPiece piece = board.getPiece(position);
         int [][] direction = {{2,1},{2,-1},{-2,1},{-2,-1},{1,2},{1,-2},{-1,2},{-1,-2}};
-        return getChessMoves(board, position, moves, piece, direction);
+        return getMoves(board, position, moves, piece, direction);
     }
 
-    private static Collection<ChessMove> getChessMoves(ChessBoard board, ChessPosition position, Collection<ChessMove> moves, ChessPiece piece, int[][] direction) {
-        for (int[] dir : direction) {
-            int endRow = position.getRow() + dir[0];
-            int endCol = position.getColumn() + dir[1];
+    private static Collection<ChessMove> getMoves(ChessBoard brd, ChessPosition pos, Collection<ChessMove> mov, ChessPiece piece, int[][] dirs) {
+        for (int[] dir : dirs) {
+            int endRow = pos.getRow() + dir[0];
+            int endCol = pos.getColumn() + dir[1];
             ChessPosition endPosition = new ChessPosition(endRow, endCol);
             if (isWithinBoard(endPosition)) {
-                ChessPiece occupyingPiece = board.getPiece(endPosition);
+                ChessPiece occupyingPiece = brd.getPiece(endPosition);
                 if (occupyingPiece == null || occupyingPiece.getTeamColor() != piece.getTeamColor()) {
-                    moves.add(new ChessMove(position, endPosition, null));
+                    mov.add(new ChessMove(pos, endPosition, null));
                 }
             }
         }
-        return moves;
+        return mov;
     }
 
     private static Collection<ChessMove> kingMovesCalculator(ChessBoard board, ChessPosition position) {
         Collection<ChessMove> moves = new HashSet<>();
         ChessPiece piece = board.getPiece(position);
         int [][] direction = {{1,0},{-1,0},{0,1},{0,-1},{1,1},{1,-1},{-1,1},{-1,-1}};
-        return getChessMoves(board, position, moves, piece, direction);
+        return getMoves(board, position, moves, piece, direction);
     }
 
     private static Collection<ChessMove> queenMovesCalculator(ChessBoard board, ChessPosition position) {
