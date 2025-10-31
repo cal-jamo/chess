@@ -78,7 +78,7 @@ public class Server {
         });
         javalin.delete("/session", (req) -> {
             String authToken = req.header("authorization");
-            userService.logoutUser(authToken); // If this throws, Javalin catches it
+            userService.logoutUser(authToken);
             req.status(200);
         });
         javalin.get("/game", (req) -> {
