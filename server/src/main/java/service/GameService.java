@@ -1,10 +1,11 @@
 package service;
 import dataaccess.*;
+import dataaccess.auth.AuthDAO;
+import dataaccess.game.GameDAO;
 import model.AuthData;
 import model.GameData;
 import model.JoinRequest;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 

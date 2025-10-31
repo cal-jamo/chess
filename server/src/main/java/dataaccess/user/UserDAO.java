@@ -1,4 +1,5 @@
-package dataaccess;
+package dataaccess.user;
+import dataaccess.DataAccessException;
 import model.UserData;
 
 public interface UserDAO {

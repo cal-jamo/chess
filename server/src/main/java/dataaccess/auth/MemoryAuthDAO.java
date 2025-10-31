@@ -1,4 +1,5 @@
-package dataaccess;
+package dataaccess.auth;
+import dataaccess.DataAccessException;
 import model.AuthData;
 import java.util.HashMap;
 import java.util.UUID;

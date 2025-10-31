@@ -1,6 +1,12 @@
 package server;
 import com.google.gson.Gson;
 import dataaccess.*;
+import dataaccess.auth.AuthDAO;
+import dataaccess.auth.MemoryAuthDAO;
+import dataaccess.game.GameDAO;
+import dataaccess.game.MemoryGameDAO;
+import dataaccess.user.MemoryUserDAO;
+import dataaccess.user.UserDAO;
 import io.javalin.*;
 import io.javalin.json.JavalinGson;
 import model.AuthData;

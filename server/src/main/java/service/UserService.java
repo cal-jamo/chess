@@ -1,5 +1,8 @@
 package service;
 import dataaccess.*;
+import dataaccess.auth.AuthDAO;
+import dataaccess.game.GameDAO;
+import dataaccess.user.UserDAO;
 import model.AuthData;
 import model.UserData;
 
