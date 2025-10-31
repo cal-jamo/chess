@@ -24,6 +24,13 @@ public class Server {
             config.staticFiles.add("web");
             config.jsonMapper(new JavalinGson());
         });
+        javalin.exception(DataAccessException.class, (e, ctx) -> {
+            if (e.getMessage().equals("Error: Unauthorized")) {
+                ctx.status(401).json(java.util.Map.of("message", e.getMessage()));
+            } else {
+                ctx.status(500).json(java.util.Map.of("message", String.format("Error: %s", e.getMessage())));
+            }
+        });
         try {
             DatabaseManager.createDatabase();
         } catch (Exception e) {
@@ -70,24 +77,14 @@ public class Server {
                 else {req.status(500).json(java.util.Map.of("message", String.format("Error: %s", e.getMessage())));}}
         });
         javalin.delete("/session", (req) -> {
-            try {
-                String authToken = req.header("authorization");
-                userService.logoutUser(authToken);
-                req.status(200);
-            } catch (DataAccessException e) {
-                if (e.getMessage().equals("Error: Unauthorized")) {
-                    req.status(401).json(java.util.Map.of("message", e.getMessage()));
-                } else {req.status(500).json(java.util.Map.of("message", String.format("Error: %s", e.getMessage())));}}
+            String authToken = req.header("authorization");
+            userService.logoutUser(authToken); // If this throws, Javalin catches it
+            req.status(200);
         });
         javalin.get("/game", (req) -> {
-            try {
-                String authToken = req.header("authorization");
-                Collection<GameData> listOfGames = gameService.listGames(authToken);
-                req.status(200).json(java.util.Map.of("games", listOfGames));
-            } catch (DataAccessException e) {
-                if (e.getMessage().equals("Error: Unauthorized")) {
-                    req.status(401).json(java.util.Map.of("message", e.getMessage()));
-                } else {req.status(500).json(java.util.Map.of("message", String.format("Error: %s", e.getMessage())));}}
+            String authToken = req.header("authorization");
+            Collection<GameData> listOfGames = gameService.listGames(authToken);
+            req.status(200).json(java.util.Map.of("games", listOfGames));
         });
         javalin.post("/game", (req) -> {
             try {
