@@ -101,4 +101,58 @@ public class DatabaseTests {
             assertNull(authDAO.getAuth(auth.authToken()));
         }
     }
+    @Nested
+    @DisplayName("DBUserDAO Tests")
+    class UserDAOTests {
+
+        @Test
+        @DisplayName("Positive insertUser")
+        public void insertUserPositive() throws DataAccessException {
+            UserData user = new UserData("cwjamo", "halogamer", "cwjamo@email.com");
+            userDAO.insertUser(user);
+
+            UserData fromDB = userDAO.getUser("cwjamo");
+            assertNotNull(fromDB);
+            assertEquals(user.username(), fromDB.username());
+            assertEquals(user.email(), fromDB.email());
+            assertEquals(user.password(), fromDB.password());
+        }
+
+        @Test
+        @DisplayName("Negative insertUser: username taken")
+        public void insertUserNegative() throws DataAccessException {
+            UserData user = new UserData("cwjamo", "halogamer", "cwjamo@email.com");
+            userDAO.insertUser(user);
+            UserData duplicateUser = new UserData("cwjamo", "Halogamer", "cjwamo@email.com");
+            assertThrows(DataAccessException.class, () -> {
+                userDAO.insertUser(duplicateUser);
+            });
+        }
+
+        @Test
+        @DisplayName("Positive getUser")
+        public void getUserPositive() throws DataAccessException {
+            UserData user = new UserData("cwjamo", "halogamer", "kpdh@calvin.com");
+            userDAO.insertUser(user);
+            UserData fromDB = userDAO.getUser("cwjamo");
+            assertEquals(user, fromDB);
+        }
+
+        @Test
+        @DisplayName("Negative getUser: user doesnt exist")
+        public void getUserNegative() throws DataAccessException {
+            UserData fromDB = userDAO.getUser("ajDB");
+            assertNull(fromDB);
+        }
+
+        @Test
+        @DisplayName("Positive clear Users")
+        public void clearUserPositive() throws DataAccessException {
+            UserData user = new UserData("cwjamo", "halogamer", "kpdh@calvin.com");
+            userDAO.insertUser(user);
+            userDAO.clear();
+            UserData fromDB = userDAO.getUser("cwjamo");
+            assertNull(fromDB);
+        }
+    }
 }

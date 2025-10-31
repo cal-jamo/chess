@@ -61,6 +61,13 @@ public class DBAuthDAO implements AuthDAO {
 
     @Override
     public void clear() throws DataAccessException {
-
+        var authQuery = "DELETE FROM auth";
+        try (var connection = DatabaseManager.getConnection()) {
+            try (var statement = connection.prepareStatement(authQuery)) {
+                statement.executeUpdate();
+            }
+        } catch (SQLException | DataAccessException e) {
+            throw new DataAccessException("Failed to clear auth: " + e.getMessage());
+        }
     }
 }
