@@ -12,28 +12,32 @@ import java.util.Collection;
 import java.util.List;
 
 public class DBGameDAO implements GameDAO {
-    private int nextGameID = 1;
+    int nextGameID = 1;
 
     @Override
     public int createGame(String gameName) throws DataAccessException {
-        int gameID = nextGameID;
         ChessGame newChessGame = new ChessGame();
         String newGameJson = new Gson().toJson(newChessGame);
-        var gameQuery = "INSERT INTO games (gameID, whiteUsername, blackUsername, gameName, chessGame) VALUES (?, ?, ?, ?, ?)";
+        var gameQuery = "INSERT INTO games (whiteUsername, blackUsername, gameName, chessGame) VALUES (?, ?, ?, ?)";
+
         try (var connection = DatabaseManager.getConnection()) {
-            try (var statement = connection.prepareStatement(gameQuery)) {
-                statement.setInt(1, gameID);
+            try (var statement = connection.prepareStatement(gameQuery, Statement.RETURN_GENERATED_KEYS)) {
+                statement.setNull(1, Types.VARCHAR);
                 statement.setNull(2, Types.VARCHAR);
-                statement.setNull(3, Types.VARCHAR);
-                statement.setString(4, gameName);
-                statement.setString(5, newGameJson);
+                statement.setString(3, gameName);
+                statement.setString(4, newGameJson);
                 statement.executeUpdate();
+                try (var rs = statement.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        return rs.getInt(1);
+                    } else {
+                        throw new DataAccessException("Failed to create game, no ID returned.");
+                    }
+                }
             }
         } catch (SQLException | DataAccessException e) {
             throw new DataAccessException("Failed to insert game: " + e.getMessage());
         }
-        nextGameID += 1;
-        return gameID;
     }
 
     @Override
