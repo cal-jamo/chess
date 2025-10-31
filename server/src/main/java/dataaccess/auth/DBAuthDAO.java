@@ -29,12 +29,34 @@ public class DBAuthDAO implements AuthDAO {
 
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
-        return null;
+        var authQuery = "SELECT * FROM auth WHERE authToken = ?";
+        try (var connection = DatabaseManager.getConnection()) {
+            try (var statement = connection.prepareStatement(authQuery)) {
+                statement.setString(1, authToken);
+                try (var resultSet = statement.executeQuery()) {
+                    if (resultSet.next()) {
+                        return new AuthData(resultSet.getString("authToken"), resultSet.getString("username"));
+                    } else {
+                        return null;
+                    }
+                }
+            }
+        } catch (SQLException | DataAccessException e) {
+            throw new DataAccessException("Failed to get auth: " + e.getMessage());
+        }
     }
 
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
-
+        var authQuery = "DELETE FROM auth WHERE authToken = ?";
+        try (var connection = DatabaseManager.getConnection()) {
+            try (var statement = connection.prepareStatement(authQuery)) {
+                statement.setString(1, authToken);
+                statement.executeUpdate();
+            }
+        } catch (SQLException | DataAccessException e) {
+            throw new DataAccessException("Failed to delete auth: " + e.getMessage());
+        }
     }
 
     @Override
