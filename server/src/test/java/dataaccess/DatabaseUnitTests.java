@@ -1,6 +1,5 @@
 package dataaccess;
 
-import dataaccess.*;
 import dataaccess.auth.AuthDAO;
 import dataaccess.auth.DBAuthDAO;
 import dataaccess.game.DBGameDAO;
@@ -15,7 +14,7 @@ import java.util.Collection;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class DatabaseTests {
+public class DatabaseUnitTests {
 
     private static UserDAO userDAO;
     private static AuthDAO authDAO;

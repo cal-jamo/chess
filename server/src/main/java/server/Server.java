@@ -3,10 +3,9 @@ import com.google.gson.Gson;
 import dataaccess.*;
 import dataaccess.auth.AuthDAO;
 import dataaccess.auth.DBAuthDAO;
-import dataaccess.auth.MemoryAuthDAO;
+import dataaccess.game.DBGameDAO;
 import dataaccess.game.GameDAO;
-import dataaccess.game.MemoryGameDAO;
-import dataaccess.user.MemoryUserDAO;
+import dataaccess.user.DBUserDAO;
 import dataaccess.user.UserDAO;
 import io.javalin.*;
 import io.javalin.json.JavalinGson;
@@ -18,8 +17,6 @@ import service.ResetService;
 import service.UserService;
 import model.JoinRequest;
 import java.util.Collection;
-
-
 public class Server {
     private final Javalin javalin;
     public Server() {
@@ -27,9 +24,15 @@ public class Server {
             config.staticFiles.add("web");
             config.jsonMapper(new JavalinGson());
         });
+        try {
+            DatabaseManager.createDatabase();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to initialize database", e);
+        }
+        DBInitialization.initialize();
         AuthDAO authDAO = new DBAuthDAO();
-        UserDAO userDAO = new MemoryUserDAO();
-        GameDAO gameDAO = new MemoryGameDAO();
+        UserDAO userDAO = new DBUserDAO();
+        GameDAO gameDAO = new DBGameDAO();
         ResetService resetService = new ResetService(userDAO, authDAO, gameDAO);
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
         GameService gameService = new GameService(authDAO, gameDAO);
