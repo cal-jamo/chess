@@ -5,6 +5,7 @@ import dataaccess.game.GameDAO;
 import dataaccess.user.UserDAO;
 import model.AuthData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class UserService {
     private final UserDAO userDAO;
@@ -14,21 +15,18 @@ public class UserService {
         this.userDAO = userDAO;
         this.authDAO = authDAO;
     }
-
-    // Additional methods to manage users can be added here
     public AuthData registerUser(UserData user) throws DataAccessException{
         if (user.username() == null || user.password() == null) {
             throw new DataAccessException("Error: Username and password cannot be null");
         }
-
         if (userDAO.getUser(user.username()) != null) {
             throw new DataAccessException("Error: Username already exists");
         }
-
-        userDAO.insertUser(user);
+        String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
+        UserData userToCreate = new UserData(user.username(), hashedPassword, user.email());
+        userDAO.insertUser(userToCreate);
         return authDAO.createAuth(user.username());
     }
-
     public AuthData loginUser(UserData userData) throws DataAccessException{
         if (userData.username() == null || userData.password() == null) {
             throw new DataAccessException("Error: Username and Password cannot be null");
@@ -39,7 +37,6 @@ public class UserService {
         }
         return authDAO.createAuth(userData.username());
     }
-
     public void logoutUser(String authToken) throws DataAccessException{
         authDAO.deleteAuth(authToken);
     }
