@@ -32,7 +32,7 @@ public class UserService {
             throw new DataAccessException("Error: Username and Password cannot be null");
         }
         UserData existingUser = userDAO.getUser(userData.username());
-        if (existingUser == null || !userData.password().equals(existingUser.password())) {
+        if (existingUser == null || !BCrypt.checkpw(userData.password(), existingUser.password())) {
             throw new DataAccessException("Error: Username and password does not match");
         }
         return authDAO.createAuth(userData.username());

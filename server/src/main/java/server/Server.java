@@ -40,7 +40,9 @@ public class Server {
             try {
                 resetService.resetApplication();
                 req.status(200);
-            } catch (DataAccessException e){req.status(500);}
+            } catch (DataAccessException e) {
+                req.status(500).json(java.util.Map.of("message", String.format("Error: %s", e.getMessage())));
+            }
         });
         javalin.post("/user", (req) -> {
             try {
@@ -52,7 +54,7 @@ public class Server {
                     req.status(403).json(java.util.Map.of("message", e.getMessage()));
                 } else if (e.getMessage().equals("Error: Username and password cannot be null")) {
                     req.status(400).json(java.util.Map.of("message", e.getMessage()));
-                } else {req.status(500).json(java.util.Map.of("message", e.getMessage()));}}
+                } else {req.status(500).json(java.util.Map.of("message", String.format("Error: %s", e.getMessage())));}}
         });
         javalin.post("/session", (req) -> {
             try {
@@ -65,7 +67,7 @@ public class Server {
                 } else if (e.getMessage().equals("Error: Username and password does not match")) {
                     req.status(401).json(java.util.Map.of("message", e.getMessage()));
                 }
-                else {req.status(500).json(java.util.Map.of("message", e.getMessage()));}}
+                else {req.status(500).json(java.util.Map.of("message", String.format("Error: %s", e.getMessage())));}}
         });
         javalin.delete("/session", (req) -> {
             try {
@@ -85,7 +87,7 @@ public class Server {
             } catch (DataAccessException e) {
                 if (e.getMessage().equals("Error: Unauthorized")) {
                     req.status(401).json(java.util.Map.of("message", e.getMessage()));
-                } else {req.status(500).json(java.util.Map.of("message", e.getMessage()));}}
+                } else {req.status(500).json(java.util.Map.of("message", String.format("Error: %s", e.getMessage())));}}
         });
         javalin.post("/game", (req) -> {
             try {
@@ -99,7 +101,7 @@ public class Server {
                     req.status(400).json(java.util.Map.of("message", e.getMessage()));
                 } else if (e.getMessage().equals("Error: Unauthorized")) {
                     req.status(401).json(java.util.Map.of("message", e.getMessage()));
-                } else { req.status(500).json(java.util.Map.of("message", e.getMessage()));}}
+                } else {req.status(500).json(java.util.Map.of("message", String.format("Error: %s", e.getMessage())));}}
         });
         javalin.put("/game", (req) -> {
             try {
@@ -114,9 +116,7 @@ public class Server {
                     req.status(401).json(java.util.Map.of("message", e.getMessage()));
                 } else if (e.getMessage().equals("Error: Color Already Taken")) {
                     req.status(403).json(java.util.Map.of("message", e.getMessage()));
-                } else {
-                    req.status(500).json(java.util.Map.of("message", e.getMessage()));
-                }}
+                } else {req.status(500).json(java.util.Map.of("message", String.format("Error: %s", e.getMessage())));}}
         });
     }
     public int run(int desiredPort) {
