@@ -2,6 +2,7 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.*;
 import dataaccess.auth.AuthDAO;
+import dataaccess.auth.DBAuthDAO;
 import dataaccess.auth.MemoryAuthDAO;
 import dataaccess.game.GameDAO;
 import dataaccess.game.MemoryGameDAO;
@@ -26,7 +27,7 @@ public class Server {
             config.staticFiles.add("web");
             config.jsonMapper(new JavalinGson());
         });
-        AuthDAO authDAO = new MemoryAuthDAO();
+        AuthDAO authDAO = new DBAuthDAO();
         UserDAO userDAO = new MemoryUserDAO();
         GameDAO gameDAO = new MemoryGameDAO();
         ResetService resetService = new ResetService(userDAO, authDAO, gameDAO);
