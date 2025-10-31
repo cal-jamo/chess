@@ -85,7 +85,7 @@ public class DatabaseTests {
         @Test
         @DisplayName("Negative deleteAuth: bad auth")
         public void deleteAuthNegative() throws DataAccessException {
-            assertDoesNotThrow(() -> {
+            assertThrows(DataAccessException.class, () -> {
                 authDAO.deleteAuth("iHeartBYUBball");
             });
         }
@@ -219,7 +219,8 @@ public class DatabaseTests {
                     gameID,
                     "cwjamo",
                     originalGame.blackUsername(),
-                    originalGame.gameName()
+                    originalGame.gameName(),
+                    originalGame.game()
             );
             gameDAO.updateGame(gameID, updatedGame);
             GameData fromDB = gameDAO.getGame(gameID);
@@ -230,7 +231,7 @@ public class DatabaseTests {
         @Test
         @DisplayName("Negative updateGame: Game doesnt exist")
         public void updateGameNegative() throws DataAccessException {
-            GameData fakeGame = new GameData(6767, "cwjamo", null, "This aint a game");
+            GameData fakeGame = new GameData(6767, "cwjamo", null, "This aint a game", null);
             assertDoesNotThrow(() -> {
                 gameDAO.updateGame(6767, fakeGame);
             });

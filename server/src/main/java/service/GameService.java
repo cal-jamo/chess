@@ -62,12 +62,12 @@ public class GameService {
             if (gameData.whiteUsername() != null) {
                 throw new DataAccessException(ERROR_MAP.get(403));
             }
-            gameData = new GameData(gameData.gameID(), authData.username(), gameData.blackUsername(), gameData.gameName());
+            gameData = new GameData(gameData.gameID(), authData.username(), gameData.blackUsername(), gameData.gameName(), gameData.game());
         } else if (playerColor.equals("BLACK")) {
             if (gameData.blackUsername() != null) {
                 throw new DataAccessException(ERROR_MAP.get(403));
             }
-            gameData = new GameData(gameData.gameID(), gameData.whiteUsername(), authData.username(), gameData.gameName());
+            gameData = new GameData(gameData.gameID(), gameData.whiteUsername(), authData.username(), gameData.gameName(), gameData.game());
         }
         gameDAO.updateGame(gameData.gameID(), gameData);
     }

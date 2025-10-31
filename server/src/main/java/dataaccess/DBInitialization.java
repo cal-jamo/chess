@@ -31,8 +31,8 @@ public class DBInitialization {
                 var initGamesTable = """            
                     CREATE TABLE IF NOT EXISTS games (
                         gameID INTEGER NOT NULL,
-                        whiteUsername VARCHAR(255) NOT NULL,
-                        blackUsername VARCHAR(255) NOT NULL,
+                        whiteUsername VARCHAR(255) NULL,
+                        blackUsername VARCHAR(255) NULL,
                         gameName VARCHAR(255) NOT NULL,
                         chessGame TEXT NOT NULL,
                         PRIMARY KEY (gameID)

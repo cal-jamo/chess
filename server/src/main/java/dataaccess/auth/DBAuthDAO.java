@@ -52,9 +52,12 @@ public class DBAuthDAO implements AuthDAO {
         try (var connection = DatabaseManager.getConnection()) {
             try (var statement = connection.prepareStatement(authQuery)) {
                 statement.setString(1, authToken);
-                statement.executeUpdate();
+                int rowsAffected = statement.executeUpdate();
+                if (rowsAffected == 0) {
+                    throw new DataAccessException("Error: Unauthorized");
+                }
             }
-        } catch (SQLException | DataAccessException e) {
+        } catch (SQLException e) {
             throw new DataAccessException("Failed to delete auth: " + e.getMessage());
         }
     }
