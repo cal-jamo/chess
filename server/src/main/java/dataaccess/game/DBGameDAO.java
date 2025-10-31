@@ -65,7 +65,6 @@ public class DBGameDAO implements GameDAO {
         }
     }
 
-
     @Override
     public Collection<GameData> listGames() throws DataAccessException {
         var gameQuery = "SELECT * FROM games";
@@ -99,6 +98,13 @@ public class DBGameDAO implements GameDAO {
 
     @Override
     public void clear() throws DataAccessException {
-
+        var gameQuery = "DELETE FROM games";
+        try (var connection = DatabaseManager.getConnection()) {
+            try (var statement = connection.prepareStatement(gameQuery)) {
+                statement.executeUpdate();
+            }
+        } catch (SQLException | DataAccessException e) {
+            throw new DataAccessException("Failed to clear game: " + e.getMessage());
+        }
     }
 }
