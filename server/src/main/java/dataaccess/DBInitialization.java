@@ -9,13 +9,23 @@ public class DBInitialization {
                 throw new RuntimeException(ex);
             }
             try (var connection = DatabaseManager.getConnection()) {
-                var createAuthTable = """            
+                var initAuthTable = """            
                     CREATE TABLE IF NOT EXISTS auth (
                         username VARCHAR(255) NOT NULL,
                         authToken VARCHAR(255) NOT NULL,
                         PRIMARY KEY (authToken)
                     )""";
-                try (var statement = connection.prepareStatement(createAuthTable)) {
+                try (var statement = connection.prepareStatement(initAuthTable)) {
+                    statement.executeUpdate();
+                }
+                var initUserTable = """            
+                    CREATE TABLE IF NOT EXISTS user (
+                        username VARCHAR(255) NOT NULL,
+                        password VARCHAR(255) NOT NULL,
+                        email VARCHAR(255),
+                        PRIMARY KEY (username)
+                    )""";
+                try (var statement = connection.prepareStatement(initUserTable)) {
                     statement.executeUpdate();
                 }
             }
