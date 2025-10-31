@@ -6,9 +6,7 @@ import dataaccess.DatabaseManager;
 import model.GameData;
 import model.UserData;
 
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -93,7 +91,20 @@ public class DBGameDAO implements GameDAO {
 
     @Override
     public void updateGame(int gameID, GameData game) throws DataAccessException {
-
+        String gameJson = new Gson().toJson(game.game());
+        var gameQuery = "UPDATE games SET whiteUsername = ?, blackUsername = ?, gameName = ?, chessGame = ? WHERE gameID = ?";
+        try (Connection connection = DatabaseManager.getConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement(gameQuery)) {
+                statement.setString(1, game.whiteUsername());
+                statement.setString(2, game.blackUsername());
+                statement.setString(3, game.gameName());
+                statement.setString(4, gameJson);
+                statement.setInt(5, gameID);
+                statement.executeUpdate();
+            }
+        } catch (SQLException | DataAccessException e) {
+            throw new DataAccessException("Failed to update game: " + e.getMessage());
+        }
     }
 
     @Override
