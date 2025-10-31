@@ -65,6 +65,7 @@ public class DBGameDAO implements GameDAO {
         }
     }
 
+
     @Override
     public Collection<GameData> listGames() throws DataAccessException {
         var gameQuery = "SELECT * FROM games";
