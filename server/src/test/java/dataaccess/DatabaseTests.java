@@ -155,4 +155,95 @@ public class DatabaseTests {
             assertNull(fromDB);
         }
     }
+
+    @Nested
+    @DisplayName("GameDAO Tests")
+    class GameDAOTests {
+
+        @Test
+        @DisplayName("Positive createGame")
+        public void createGamePositive() throws DataAccessException {
+            int gameID = gameDAO.createGame("My Test Game");
+            assertTrue(gameID > 0);
+            GameData fromDB = gameDAO.getGame(gameID);
+            assertNotNull(fromDB);
+            assertEquals(gameID, fromDB.gameID());
+            assertEquals("My Test Game", fromDB.gameName());
+            assertNull(fromDB.whiteUsername());
+            assertNull(fromDB.blackUsername());
+        }
+
+        @Test
+        @DisplayName("Negative createGame: bad request")
+        public void createGameNegative() throws DataAccessException {
+            assertThrows(DataAccessException.class, () -> {
+                gameDAO.createGame(null);
+            });
+        }
+
+        @Test
+        @DisplayName("Positive getGame")
+        public void getGamePositive() throws DataAccessException {
+            int gameID = gameDAO.createGame("My Test Game");
+            GameData fromDB = gameDAO.getGame(gameID);
+            assertNotNull(fromDB);
+            assertEquals(gameID, fromDB.gameID());
+        }
+
+        @Test
+        @DisplayName("Negative getGame: game does not exist")
+        public void getGameNegative() throws DataAccessException {
+            GameData fromDB = gameDAO.getGame(6767);
+            assertNull(fromDB);
+        }
+
+        @Test
+        @DisplayName("Positive listGames")
+        public void listGamesPositive() throws DataAccessException {
+            Collection<GameData> games = gameDAO.listGames();
+            assertNotNull(games);
+            assertTrue(games.isEmpty());
+            gameDAO.createGame("Game 1");
+            gameDAO.createGame("Game 2");
+            games = gameDAO.listGames();
+            assertNotNull(games);
+            assertEquals(2, games.size());
+        }
+
+        @Test
+        @DisplayName("Positive updateGame (Join Game)")
+        public void updateGamePositive() throws DataAccessException {
+            int gameID = gameDAO.createGame("Game to Join");
+            GameData originalGame = gameDAO.getGame(gameID);
+            GameData updatedGame = new GameData(
+                    gameID,
+                    "cwjamo",
+                    originalGame.blackUsername(),
+                    originalGame.gameName()
+            );
+            gameDAO.updateGame(gameID, updatedGame);
+            GameData fromDB = gameDAO.getGame(gameID);
+            assertNotNull(fromDB);
+            assertEquals("cwjamo", fromDB.whiteUsername());
+        }
+
+        @Test
+        @DisplayName("Negative updateGame: Game doesnt exist")
+        public void updateGameNegative() throws DataAccessException {
+            GameData fakeGame = new GameData(6767, "cwjamo", null, "This aint a game");
+            assertDoesNotThrow(() -> {
+                gameDAO.updateGame(6767, fakeGame);
+            });
+            assertNull(gameDAO.getGame(6767));
+        }
+
+        @Test
+        @DisplayName("Positive clear Games")
+        public void clearGamePositive() throws DataAccessException {
+            gameDAO.createGame("My Test Game");
+            gameDAO.clear();
+            Collection<GameData> games = gameDAO.listGames();
+            assertTrue(games.isEmpty());
+        }
+    }
 }
