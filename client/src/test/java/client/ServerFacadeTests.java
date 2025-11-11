@@ -1,12 +1,16 @@
 package client;
 
+import ServerFacade.ServerFacade;
 import org.junit.jupiter.api.*;
 import server.Server;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 
 public class ServerFacadeTests {
 
     private static Server server;
+    static ServerFacade facade;
 
     @BeforeAll
     public static void init() {
@@ -18,6 +22,12 @@ public class ServerFacadeTests {
     @AfterAll
     static void stopServer() {
         server.stop();
+    }
+
+    @BeforeEach
+    public void clearDatabase() {
+
+        assertDoesNotThrow(() -> facade.clear());
     }
 
 
