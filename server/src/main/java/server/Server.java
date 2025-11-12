@@ -92,7 +92,7 @@ public class Server {
                 var newGame = new Gson().fromJson(req.body(), java.util.Map.class);
                 String gameName = (String) newGame.get("gameName");
                 int newGameId = gameService.createGame(authToken, gameName);
-                req.status(200).json(java.util.Map.of("gameID", newGameId));
+                req.status(200).json(java.util.Map.of("gameID", newGameId, "gameName", gameName));
             } catch (DataAccessException e) {
                 if (e.getMessage().equals("Error: Bad Request")) {
                     req.status(400).json(java.util.Map.of("message", e.getMessage()));

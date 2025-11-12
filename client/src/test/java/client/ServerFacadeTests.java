@@ -107,5 +107,33 @@ public class ServerFacadeTests {
         assertNotNull(exception.getMessage());
     }
 
+    @Test
+    @DisplayName("Create Game Success")
+    public void createGameSuccess() {
+        try {
+            var authData = facade.register("cwjamo", "pass", "cwjamo@email.com");
+            String authToken = authData.authToken();
+
+            var gameData = facade.createGame("MyNewGame", authToken);
+            System.out.println(gameData);
+
+            assertNotNull(gameData);
+            assertNotNull(gameData.gameID());
+            assertTrue(gameData.gameID() > 0);
+            assertEquals("MyNewGame", gameData.gameName());
+
+        } catch (ServerFacade.ServerFacadeException e) {
+            fail("Should not have thrown exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    @DisplayName("Create Game Fail (Bad Token)")
+    public void createGameFailBadToken() {
+        assertThrows(ServerFacade.ServerFacadeException.class, () -> {
+            facade.createGame("FailGame", "this-is-a-bad-token");
+        }, "Creating a game with an invalid token should throw an exception.");
+    }
+
 
 }

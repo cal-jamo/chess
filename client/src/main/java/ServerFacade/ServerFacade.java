@@ -75,7 +75,13 @@ public class ServerFacade {
         return this.makeRequest("POST", "/session", requestInfo, null, AuthData.class);
     }
     public void logout(String authToken) throws ServerFacadeException {
-        this.makeRequest("DELETE","/session", null, authToken, Void.class);
+        this.makeRequest("DELETE","/session", null, authToken, GameData.class);
+    }
+
+    public GameData createGame(String gameName, String authToken) throws ServerFacadeException {
+        var requestInfo = new java.util.HashMap<String, String>();
+        requestInfo.put("gameName", gameName);
+        return makeRequest("POST", "/game", requestInfo, authToken, GameData.class);
     }
 
     public void clear() throws ServerFacadeException {
