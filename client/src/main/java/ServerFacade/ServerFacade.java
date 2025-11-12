@@ -77,6 +77,6 @@ public class ServerFacade {
     }
 
     public void clear() throws ServerFacadeException {
-
+        this.makeRequest("DELETE", "/db", null, null, null);
     }
 }
