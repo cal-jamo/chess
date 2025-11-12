@@ -62,4 +62,47 @@ public class ServerFacadeTests {
         assertNotNull(exception.getMessage(), "Error message should not be null");
     }
 
+    @Test
+    @DisplayName("Login Success")
+    public void loginSuccess() {
+        assertDoesNotThrow(() -> facade.register("cwjamo", "password", "cwjamo@email.com"));
+        AuthData authData = assertDoesNotThrow(() ->
+                facade.login("cwjamo", "password")
+        );
+        assertNotNull(authData);
+        assertNotNull(authData.authToken());
+        assertEquals("loginUser", authData.username());
+    }
+
+    @Test
+    @DisplayName("Login Fails: Bad password")
+    public void loginFailsBadPassword() {
+        assertDoesNotThrow(() -> facade.register("cwjamo", "password", "cwjamo@email.com"));
+        ServerFacade.ServerFacadeException exception = assertThrows(
+                ServerFacade.ServerFacadeException.class,
+                () -> facade.login("cwjamo", "byu6767")
+        );
+        assertNotNull(exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Logout Success")
+    public void logoutSuccess() {
+        AuthData auth = assertDoesNotThrow(() -> facade.register("cwjamo", "password", "cwjamo@email.com"));
+        String authToken = auth.authToken();
+        assertDoesNotThrow(() -> facade.logout(authToken));
+    }
+
+    @Test
+    @DisplayName("Logout Fails: Bad auth")
+    public void logoutFailsBadAuth() {
+        String authToken = "i-love-byu-basketball";
+        ServerFacade.ServerFacadeException exception = assertThrows(
+                ServerFacade.ServerFacadeException.class,
+                () -> facade.logout(authToken)
+        );
+        assertNotNull(exception.getMessage());
+    }
+
+
 }
