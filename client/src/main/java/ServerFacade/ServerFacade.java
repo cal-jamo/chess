@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.Collection;
 
 
 public class ServerFacade {
@@ -82,6 +83,22 @@ public class ServerFacade {
         var requestInfo = new java.util.HashMap<String, String>();
         requestInfo.put("gameName", gameName);
         return makeRequest("POST", "/game", requestInfo, authToken, GameData.class);
+    }
+
+    private static class ListGamesResponse {
+        Collection<GameData> games;
+    }
+
+    public Collection<GameData> listGames(String authToken) throws ServerFacadeException {
+        ListGamesResponse response = this.makeRequest("GET", "/game", null, authToken, ListGamesResponse.class);
+        return response.games;
+    }
+
+    public void joinGame(String gameName, String playerColor, String authToken) throws ServerFacadeException {
+        var requestInfo = new java.util.HashMap<String, String>();
+        requestInfo.put("gameName", gameName);
+        requestInfo.put("playerColor", playerColor);
+        makeRequest("POST", "/game", requestInfo, authToken, GameData.class);
     }
 
     public void clear() throws ServerFacadeException {

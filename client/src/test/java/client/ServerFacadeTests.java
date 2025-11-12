@@ -2,8 +2,12 @@ package client;
 
 import ServerFacade.ServerFacade;
 import model.AuthData;
+import model.GameData;
 import org.junit.jupiter.api.*;
 import server.Server;
+
+import java.util.Collection;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -135,5 +139,53 @@ public class ServerFacadeTests {
         }, "Creating a game with an invalid token should throw an exception.");
     }
 
+    @Test
+    @DisplayName("List Games Success")
+    public void listGamesSuccess() {
+        try {
+            var authData = facade.register("cwjamo", "pass", "cwjamo@email.com");
+            String authToken = authData.authToken();
+            facade.createGame("MyNewGame-1", authToken);
+            facade.createGame("MyNewGame-2", authToken);
+            Collection<GameData> listOfGames = facade.listGames(authToken);
+            assertNotNull(listOfGames);
+            assertEquals(2, listOfGames.size(), "Should have found two games.");
+            assertTrue(listOfGames.stream().anyMatch(game -> game.gameName().equals("MyNewGame-1")));
+            assertTrue(listOfGames.stream().anyMatch(game -> game.gameName().equals("MyNewGame-2")));
+        } catch (ServerFacade.ServerFacadeException e) {
+            fail("Should not have thrown exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    @DisplayName("List Games Fail (Bad Token)")
+    public void listGamesFailBadToken() {
+        assertThrows(ServerFacade.ServerFacadeException.class, () -> {
+            facade.listGames("this-is-a-bad-token");
+        }, "Listing games with an invalid token should throw an exception.");
+    }
+    @Test
+    @DisplayName("Join Games Success")
+    public void joinGameSuccess() {
+        try {
+            var authData = facade.register("cwjamo", "pass", "cwjamo@email.com");
+            String authToken = authData.authToken();
+            facade.createGame("MyNewGame-1", authToken);
+            assertDoesNotThrow(() -> facade.joinGame("MyNewGame-1", "BLACK", authToken));
+        } catch (ServerFacade.ServerFacadeException e) {
+            fail("Should not have thrown exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    @DisplayName("Join Game Fail: null game name")
+    public void joinGameFailNullGameName() throws ServerFacade.ServerFacadeException {
+        var authData = facade.register("cwjamo", "pass", "cwjamo@email.com");
+        String authToken = authData.authToken();
+        facade.createGame("MyNewGame-1", authToken);
+        assertThrows(ServerFacade.ServerFacadeException.class, () -> {
+            facade.joinGame(null, "BLACK", authToken);
+        }, "Creating a game with an invalid token should throw an exception.");
+    }
 
 }
