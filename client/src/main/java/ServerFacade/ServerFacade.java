@@ -14,7 +14,7 @@ import java.net.URL;
 
 public class ServerFacade {
     private final String serverURL;
-    public ServerFacade(String port) {
+    public ServerFacade(int port) {
         this.serverURL = "http://localhost:" + port;
     }
     private <T> T makeRequest(String method, String path, Object requestBody, String authToken, Class<T> responseClass) throws ServerFacadeException {
