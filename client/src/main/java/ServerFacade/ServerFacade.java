@@ -65,15 +65,16 @@ public class ServerFacade {
             super(message);
         }
     }
+
     public AuthData register(String username, String password, String email) throws ServerFacadeException {
         UserData requestInfo = new UserData(username, password, email);
         return this.makeRequest("POST", "/user", requestInfo, null, AuthData.class);
     }
     public AuthData login(String username, String password) throws ServerFacadeException {
         UserData requestInfo = new UserData(username, password, null);
-        return this.makeRequest("POST", "/user", requestInfo, null, AuthData.class);
+        return this.makeRequest("POST", "/session", requestInfo, null, AuthData.class);
     }
-    public AuthData logout(String authToken) throws ServerFacadeException {
+    public void logout(String authToken) throws ServerFacadeException {
         throw new ServerFacadeException("Not implemented yet");
     }
 

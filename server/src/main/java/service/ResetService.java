@@ -16,8 +16,8 @@ public class ResetService {
     }
 
     public void resetApplication() throws DataAccessException {
-        userDAO.clear();
         authDAO.clear();
         gameDAO.clear();
+        userDAO.clear();
     }
 }

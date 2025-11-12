@@ -4,7 +4,6 @@ import ServerFacade.ServerFacade;
 import model.AuthData;
 import org.junit.jupiter.api.*;
 import server.Server;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -12,11 +11,13 @@ public class ServerFacadeTests {
 
     private static Server server;
     static ServerFacade facade;
+    private static AuthData authData;
+    private static int port;
 
     @BeforeAll
     public static void init() {
         server = new Server();
-        var port = server.run(0);
+        port = server.run(0);
         facade = new ServerFacade(port);
         System.out.println("Started test HTTP server on " + port);
     }
@@ -27,26 +28,18 @@ public class ServerFacadeTests {
     }
 
     @BeforeEach
-    public void clearDatabase() {
-
-        assertDoesNotThrow(() -> facade.clear());
+    public void setup() throws ServerFacade.ServerFacadeException {
+        facade.clear();
     }
 
+    @Test
+    public void clearDB() throws ServerFacade.ServerFacadeException {
+        facade.clear();
+    }
 
     @Test
     public void sampleTest() {
         Assertions.assertTrue(true);
-    }
-
-    @Test
-    @DisplayName("Register Success")
-    public void registerSuccess() {
-        AuthData authData = assertDoesNotThrow(() ->
-                facade.register("cwjamo", "password", "cwjamo@email.com")
-        );
-        assertNotNull(authData, "AuthData object should not be null");
-        assertNotNull(authData.authToken(), "AuthToken should not be null");
-        assertEquals("cwjamo", authData.username(), "Username should match the one registered");
     }
 
     @Test
@@ -63,15 +56,25 @@ public class ServerFacadeTests {
     }
 
     @Test
-    @DisplayName("Login Success")
-    public void loginSuccess() {
-        assertDoesNotThrow(() -> facade.register("cwjamo", "password", "cwjamo@email.com"));
+    @DisplayName("Register Success")
+    public void registerSuccess() {
         AuthData authData = assertDoesNotThrow(() ->
-                facade.login("cwjamo", "password")
+                facade.register("cwjamo", "password", "cwjamo@email.com")
         );
+        assertNotNull(authData, "AuthData object should not be null");
+        assertNotNull(authData.authToken(), "AuthToken should not be null");
+        assertEquals("cwjamo", authData.username(), "Username should match the one registered");
+    }
+
+    @Test
+    @DisplayName("Login Success")
+    public void loginSuccess() throws ServerFacade.ServerFacadeException {
+        facade.clear();
+        facade.register("cal", "password", "cal@email.com");
+        AuthData authData = facade.login("cal", "password");
         assertNotNull(authData);
         assertNotNull(authData.authToken());
-        assertEquals("loginUser", authData.username());
+        assertEquals("cal", authData.username());
     }
 
     @Test

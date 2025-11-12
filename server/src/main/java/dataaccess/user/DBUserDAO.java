@@ -1,9 +1,7 @@
 package dataaccess.user;
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
-import model.AuthData;
 import model.UserData;
-
 import java.sql.SQLException;
 
 public class DBUserDAO implements UserDAO {
