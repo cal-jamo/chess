@@ -75,7 +75,7 @@ public class ServerFacade {
         return this.makeRequest("POST", "/session", requestInfo, null, AuthData.class);
     }
     public void logout(String authToken) throws ServerFacadeException {
-        throw new ServerFacadeException("Not implemented yet");
+        this.makeRequest("DELETE","/session", null, authToken, Void.class);
     }
 
     public void clear() throws ServerFacadeException {
