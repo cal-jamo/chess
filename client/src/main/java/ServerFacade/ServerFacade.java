@@ -66,8 +66,8 @@ public class ServerFacade {
         }
     }
     public AuthData register(String username, String password, String email) throws ServerFacadeException {
-        // This is just a placeholder, I will implement this
-        throw new ServerFacadeException("Not implemented yet");
+        UserData requestInfo = new UserData(username, password, email);
+        return this.makeRequest("POST", "/user", requestInfo, null, AuthData.class);
     }
     public AuthData login(String username, String password) throws ServerFacadeException {
         throw new ServerFacadeException("Not implemented yet");

@@ -1,10 +1,11 @@
 package client;
 
 import ServerFacade.ServerFacade;
+import model.AuthData;
 import org.junit.jupiter.api.*;
 import server.Server;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class ServerFacadeTests {
@@ -35,6 +36,30 @@ public class ServerFacadeTests {
     @Test
     public void sampleTest() {
         Assertions.assertTrue(true);
+    }
+
+    @Test
+    @DisplayName("Register Success")
+    public void registerSuccess() {
+        AuthData authData = assertDoesNotThrow(() ->
+                facade.register("cwjamo", "password", "cwjamo@email.com")
+        );
+        assertNotNull(authData, "AuthData object should not be null");
+        assertNotNull(authData.authToken(), "AuthToken should not be null");
+        assertEquals("cwjamo", authData.username(), "Username should match the one registered");
+    }
+
+    @Test
+    @DisplayName("Register Fails: User Already Exists")
+    public void registerFailsExistingUser() {
+        assertDoesNotThrow(() ->
+                facade.register("cwjamo", "password", "cwjamo@email.com")
+        );
+        ServerFacade.ServerFacadeException exception = assertThrows(
+                ServerFacade.ServerFacadeException.class,
+                () -> facade.register("cwjamo", "password", "cwjamo@email.com")
+        );
+        assertNotNull(exception.getMessage(), "Error message should not be null");
     }
 
 }
