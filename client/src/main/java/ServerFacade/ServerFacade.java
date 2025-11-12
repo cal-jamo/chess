@@ -70,9 +70,10 @@ public class ServerFacade {
         return this.makeRequest("POST", "/user", requestInfo, null, AuthData.class);
     }
     public AuthData login(String username, String password) throws ServerFacadeException {
-        throw new ServerFacadeException("Not implemented yet");
+        UserData requestInfo = new UserData(username, password, null);
+        return this.makeRequest("POST", "/user", requestInfo, null, AuthData.class);
     }
-    public AuthData logout() throws ServerFacadeException {
+    public AuthData logout(String authToken) throws ServerFacadeException {
         throw new ServerFacadeException("Not implemented yet");
     }
 
