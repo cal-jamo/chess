@@ -164,28 +164,32 @@ public class ServerFacadeTests {
             facade.listGames("this-is-a-bad-token");
         }, "Listing games with an invalid token should throw an exception.");
     }
+
     @Test
-    @DisplayName("Join Games Success")
+    @DisplayName("Join Game Success")
     public void joinGameSuccess() {
         try {
             var authData = facade.register("cwjamo", "pass", "cwjamo@email.com");
             String authToken = authData.authToken();
-            facade.createGame("MyNewGame-1", authToken);
-            assertDoesNotThrow(() -> facade.joinGame("MyNewGame-1", "BLACK", authToken));
+            GameData createdGame = facade.createGame("MyNewGame-1", authToken);
+            int gameID = createdGame.gameID();
+            assertDoesNotThrow(() -> facade.joinGame(gameID, "BLACK", authToken));
+
         } catch (ServerFacade.ServerFacadeException e) {
             fail("Should not have thrown exception: " + e.getMessage());
         }
     }
 
     @Test
-    @DisplayName("Join Game Fail: null game name")
-    public void joinGameFailNullGameName() throws ServerFacade.ServerFacadeException {
+    @DisplayName("Join Game Fail: Bad Game ID")
+    public void joinGameFailBadGameID() throws ServerFacade.ServerFacadeException {
         var authData = facade.register("cwjamo", "pass", "cwjamo@email.com");
         String authToken = authData.authToken();
-        facade.createGame("MyNewGame-1", authToken);
+        int nonExistentGameID = 676767;
+
         assertThrows(ServerFacade.ServerFacadeException.class, () -> {
-            facade.joinGame(null, "BLACK", authToken);
-        }, "Creating a game with an invalid token should throw an exception.");
+            facade.joinGame(nonExistentGameID, "BLACK", authToken);
+        }, "Joining a non-existent game should throw an exception.");
     }
 
 }

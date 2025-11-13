@@ -94,11 +94,9 @@ public class ServerFacade {
         return response.games;
     }
 
-    public void joinGame(String gameName, String playerColor, String authToken) throws ServerFacadeException {
-        var requestInfo = new java.util.HashMap<String, String>();
-        requestInfo.put("gameName", gameName);
-        requestInfo.put("playerColor", playerColor);
-        makeRequest("POST", "/game", requestInfo, authToken, GameData.class);
+    public void joinGame(int gameID, String playerColor, String authToken) throws ServerFacadeException {
+        JoinRequest requestInfo = new JoinRequest(playerColor, gameID);
+        makeRequest("PUT", "/game", requestInfo, authToken, null);
     }
 
     public void clear() throws ServerFacadeException {
