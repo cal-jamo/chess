@@ -49,12 +49,15 @@ public class GameService {
         }
 
         String playerColor = request.playerColor();
-        if (playerColor == null || (!playerColor.equals("WHITE") && !playerColor.equals("BLACK"))) {
+        GameData gameData = gameDAO.getGame(request.gameID());
+        if (gameData == null) {
             throw new DataAccessException(ERROR_MAP.get(400));
         }
 
-        GameData gameData = gameDAO.getGame(request.gameID());
-        if (gameData == null) {
+        if (playerColor == null) {
+            return;
+        }
+        if ((!playerColor.equals("WHITE") && !playerColor.equals("BLACK"))) {
             throw new DataAccessException(ERROR_MAP.get(400));
         }
 

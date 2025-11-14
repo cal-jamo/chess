@@ -220,7 +220,7 @@ public class Repl {
             int gameNumber = Integer.parseInt(tokens[1]);
             GameData gameToJoin = this.localGamesList.get(gameNumber - 1);
             int gameID = gameToJoin.gameID();
-            serverFacade.joinGame(gameID, "WHITE", this.authToken); // null color = observe
+            serverFacade.joinGame(gameID, null, this.authToken); // null color = observe
             System.out.println("Successfully observing game " + gameToJoin.gameName());
             //drawChessboard("WHITE"); // Observers always joins from White's perspective
         } catch (IndexOutOfBoundsException | NumberFormatException e) {
