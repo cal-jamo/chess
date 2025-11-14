@@ -105,6 +105,7 @@ public class Server {
                 String authToken = req.header("authorization");
                 var joinGameRequest = new Gson().fromJson(req.body(), JoinRequest.class);
                 gameService.joinGame(authToken, joinGameRequest);
+
                 req.status(200);
             } catch (DataAccessException e) {
                 if (e.getMessage().equals("Error: Bad Request")) {

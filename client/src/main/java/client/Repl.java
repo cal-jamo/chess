@@ -191,7 +191,7 @@ public class Repl {
 
             serverFacade.joinGame(gameID, color, this.authToken);
             out.println("Successfully joined game " + gameToJoin.gameName() + " as " + color);
-            drawChessboard(color);
+            drawChessboard(gameToJoin, color);
         } catch (ServerFacade.ServerFacadeException message) {
             out.println("ServerFacade.ServerFacadeException: " + message.getMessage());
         } catch (Exception message) {
@@ -224,13 +224,9 @@ public class Repl {
             int gameNumber = Integer.parseInt(tokens[1]);
             GameData gameToJoin = this.localGamesList.get(gameNumber - 1);
             int gameID = gameToJoin.gameID();
-            serverFacade.joinGame(gameID, "", this.authToken);
-            out.println("Successfully observing game " + gameToJoin.gameName());
-            drawChessboard("WHITE");
+            drawChessboard(gameToJoin, "WHITE");
         } catch (IndexOutOfBoundsException | NumberFormatException e) {
             out.println("Error: Invalid game ID. Run 'list' to see available games.");
-        } catch (ServerFacade.ServerFacadeException e) {
-            out.println("Failed to observe game: " + e.getMessage());
         }
     }
 
@@ -254,20 +250,21 @@ public class Repl {
         out.println("  quit      - Exit the app");
         out.println();
     }
-    private void drawChessboard(String perspective) {
+    private void drawChessboard(GameData game, String perspective) {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         out.print(EscapeSequences.ERASE_SCREEN);
+        ChessGame chessGame = (ChessGame) game.game();
+        chess.ChessBoard board = chessGame.getBoard();
         if (perspective.equalsIgnoreCase("WHITE")) {
-            drawBoardInternal(out, ChessGame.TeamColor.WHITE);
+            drawBoardInternal(out, board, ChessGame.TeamColor.WHITE);
         } else {
-            drawBoardInternal(out, ChessGame.TeamColor.BLACK);
+            drawBoardInternal(out, board, ChessGame.TeamColor.BLACK);
         }
         out.print(EscapeSequences.RESET_TEXT_COLOR);
         out.print(EscapeSequences.RESET_BG_COLOR);
         out.println();
     }
-
-    private void drawBoardInternal(PrintStream out, ChessGame.TeamColor perspective) {
+    private void drawBoardInternal(PrintStream out, chess.ChessBoard board, ChessGame.TeamColor perspective) {
         drawHeader(out, perspective);
         int startRow = (perspective == ChessGame.TeamColor.WHITE) ? 8 : 1;
         int endRow = (perspective == ChessGame.TeamColor.WHITE) ? 1 : 8;
@@ -284,7 +281,7 @@ public class Repl {
                 } else {
                     out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
                 }
-                String piece = getInitialPiece(row, col);
+                String piece = getPieceFromBoard(board, row, col);
                 out.print(piece);
             }
             out.print(EscapeSequences.RESET_BG_COLOR);
@@ -293,7 +290,6 @@ public class Repl {
         }
         drawHeader(out, perspective);
     }
-
     private void drawHeader(PrintStream out, ChessGame.TeamColor perspective) {
         out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
         out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
@@ -309,7 +305,6 @@ public class Repl {
         out.print(EscapeSequences.RESET_BG_COLOR);
         out.println();
     }
-
     private void drawRowLabel(PrintStream out, int row) {
         out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
         out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
@@ -317,27 +312,32 @@ public class Repl {
         out.print(EscapeSequences.RESET_TEXT_COLOR);
         out.print(EscapeSequences.RESET_BG_COLOR);
     }
-
-    private String getInitialPiece(int row, int col) {
-        if (row == 2) return EscapeSequences.SET_TEXT_COLOR_BLUE + EscapeSequences.WHITE_PAWN;
-        if (row == 1) {
+    private String getPieceFromBoard(chess.ChessBoard board, int row, int col) {
+        chess.ChessPosition position = new chess.ChessPosition(row, col);
+        chess.ChessPiece piece = board.getPiece(position);
+        if (piece == null) {
+            return EscapeSequences.EMPTY;
+        }
+        if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
             String pieceColor = EscapeSequences.SET_TEXT_COLOR_BLUE;
-            if (col == 1 || col == 8) return pieceColor + EscapeSequences.WHITE_ROOK;
-            if (col == 2 || col == 7) return pieceColor + EscapeSequences.WHITE_KNIGHT;
-            if (col == 3 || col == 6) return pieceColor + EscapeSequences.WHITE_BISHOP;
-            if (col == 4) return pieceColor + EscapeSequences.WHITE_QUEEN;
-            if (col == 5) return pieceColor + EscapeSequences.WHITE_KING;
+            return switch (piece.getPieceType()) {
+                case ROOK -> pieceColor + EscapeSequences.WHITE_ROOK;
+                case KNIGHT -> pieceColor + EscapeSequences.WHITE_KNIGHT;
+                case BISHOP -> pieceColor + EscapeSequences.WHITE_BISHOP;
+                case QUEEN -> pieceColor + EscapeSequences.WHITE_QUEEN;
+                case KING -> pieceColor + EscapeSequences.WHITE_KING;
+                case PAWN -> pieceColor + EscapeSequences.WHITE_PAWN;
+            };
+        } else {
+            String pieceColor = EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY;
+            return switch (piece.getPieceType()) {
+                case ROOK -> pieceColor + EscapeSequences.BLACK_ROOK;
+                case KNIGHT -> pieceColor + EscapeSequences.BLACK_KNIGHT;
+                case BISHOP -> pieceColor + EscapeSequences.BLACK_BISHOP;
+                case QUEEN -> pieceColor + EscapeSequences.BLACK_QUEEN;
+                case KING -> pieceColor + EscapeSequences.BLACK_KING;
+                case PAWN -> pieceColor + EscapeSequences.BLACK_PAWN;
+            };
         }
-        if (row == 7) return EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.BLACK_PAWN;
-        if (row == 8) {
-            String pieceColor = EscapeSequences.SET_TEXT_COLOR_BLACK;
-            if (col == 1 || col == 8) return pieceColor + EscapeSequences.BLACK_ROOK;
-            if (col == 2 || col == 7) return pieceColor + EscapeSequences.BLACK_KNIGHT;
-            if (col == 3 || col == 6) return pieceColor + EscapeSequences.BLACK_BISHOP;
-            if (col == 4) return pieceColor + EscapeSequences.BLACK_QUEEN;
-            if (col == 5) return pieceColor + EscapeSequences.BLACK_KING;
-        }
-
-        return EscapeSequences.EMPTY;
     }
 }

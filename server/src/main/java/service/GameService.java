@@ -53,6 +53,7 @@ public class GameService {
         if (gameData == null) {
             throw new DataAccessException(ERROR_MAP.get(400));
         }
+        System.out.print(playerColor);
         if (playerColor == null) {
             throw new DataAccessException(ERROR_MAP.get(400));
         }
