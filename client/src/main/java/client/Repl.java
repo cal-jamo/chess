@@ -6,6 +6,7 @@ import java.util.Scanner;
 public class Repl {
     private boolean isLoggedIn = false;
     private final ServerFacade serverFacade;
+    private String authToken = null;
 
     public Repl(String serverUrl) {
         this.serverFacade = new ServerFacade(serverUrl);
@@ -13,10 +14,10 @@ public class Repl {
 
     public void run() {
         System.out.println("♕ Welcome to Chess. Type 'help' to get started.");
+
         Scanner scanner = new Scanner(System.in);
         while (true) {
-
-            if (false /* I will use isLoggedIn later */) {
+            if (isLoggedIn) {
                 System.out.print("[LOGGED_IN] >>> ");
             } else {
                 System.out.print("[LOGGED_OUT] >>> ");
@@ -24,25 +25,25 @@ public class Repl {
 
             String line = scanner.nextLine();
             String[] tokens = line.split(" ");
-            String command = tokens[0].toLowerCase();
+            String command = tokens.length > 0 ? tokens[0].toLowerCase() : "help";
 
-            switch (command) {
-                case "help":
-                    System.out.println("You typed 'help'.");
+            if (isLoggedIn) {
+                // handlePostloginCommands(command, tokens, scanner);
+                if (command.equals("logout")) {
+                    isLoggedIn = false;
+                    this.authToken = null;
+                    System.out.println("Logged out successfully.");
+                } else {
+                    System.out.println("Post-login commands not implemented yet.");
+                }
+            } else {
+                // handlePreloginCommands(command, tokens, scanner);
+                if (command.equals("quit")) {
                     break;
-                case "quit":
-                    System.out.println("Exiting Chess.");
-                    return;
-                case "login":
-                    System.out.println("You typed 'login'.");
-                    break;
-                case "register":
-                    System.out.println("You typed 'register'.");
-                    break;
-                default:
-                    System.out.println("Unknown command. Type 'help' for options.");
-                    break;
+                }
             }
         }
+        scanner.close();
+        System.out.println("Exiting Chess.");
     }
 }
