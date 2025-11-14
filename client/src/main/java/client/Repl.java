@@ -59,8 +59,8 @@ public class Repl {
             case "list":
                 listGames();
                 break;
-            case "joinGame":
-                //joinGame(scanner);
+            case "join":
+                joinGame(tokens);
                 break;
             case "observeGame":
                 //observeGame(scanner);
@@ -104,6 +104,7 @@ public class Repl {
             this.authToken = authData.authToken();
             this.isLoggedIn = true;
             System.out.println("\nRegistration successful. You are now logged in " + username);
+            listGames();
             printPostLoginHelp();
         } catch (ServerFacade.ServerFacadeException message) {
             System.out.println("ServerFacade.ServerFacadeException: " + message.getMessage());
@@ -123,6 +124,7 @@ public class Repl {
             this.authToken = authSession.authToken();
             this.isLoggedIn = true;
             System.out.println("\nLogin successful. You are now logged in " + username);
+            listGames();
         } catch (ServerFacade.ServerFacadeException message) {
             System.out.println("ServerFacade.ServerFacadeException: " + message.getMessage());
         } catch (Exception message) {
@@ -165,6 +167,32 @@ public class Repl {
         }
     }
 
+    private void joinGame(String[] tokens) {
+        try {
+            if (tokens.length > 3) {
+                System.out.println("Error: Please provide a color and game ID.");
+                System.out.println("Usage: play <COLOR> <ID>");
+                return;
+            }
+            String color = tokens[1];
+            int gameNum = Integer.parseInt(tokens[2]);
+            if (!color.equals("WHITE") && !color.equals("BLACK")) {
+                System.out.println("Error: Invalid color. Please choose WHITE or BLACK.");
+                return;
+            }
+            GameData gameToJoin = this.localGamesList.get(gameNum - 1);
+            int gameID = gameToJoin.gameID();
+
+            serverFacade.joinGame(gameID, color, this.authToken);
+            System.out.println("Successfully joined game " + gameToJoin.gameName() + " as " + color);
+            // call the implementation of the draw board here after I Implement it
+        } catch (ServerFacade.ServerFacadeException message) {
+            System.out.println("ServerFacade.ServerFacadeException: " + message.getMessage());
+        } catch (Exception message) {
+            System.out.println("An unexpected error occurred while joining game: " + message.getMessage());
+        }
+    }
+
     private void createGame(String[] tokens) {
         try {
             if (tokens.length < 2) {
@@ -175,6 +203,8 @@ public class Repl {
             String gameName = tokens[1];
             GameData game = serverFacade.createGame(gameName, this.authToken);
             System.out.println("Game created: " + game.gameName() + " (ID: " + game.gameID() + ")");
+            var listOfGames = serverFacade.listGames(authToken);
+            this.localGamesList.addAll(listOfGames);
         } catch (ServerFacade.ServerFacadeException e) {
             System.out.println("Failed to create game: " + e.getMessage());
         }
