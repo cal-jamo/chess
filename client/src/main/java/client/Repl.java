@@ -49,6 +49,15 @@ public class Repl {
         System.out.println("Exiting Chess.");
     }
 
+    private void handlePostLoginCommands(String command, String[] tokens, Scanner scanner) {
+        switch (command) {
+            case "logout":
+                isLoggedIn = false;
+                this.authToken = null;
+                //logout(scanner);
+        }
+    }
+
     private void handlePreLoginCommands(String command, String[] tokens, Scanner scanner) {
         switch (command) {
             case "help":
@@ -105,6 +114,16 @@ public class Repl {
             System.out.println("ServerFacade.ServerFacadeException: " + message.getMessage());
         } catch (Exception message) {
             System.out.println("An unexpected error occurred while logging in: " + message.getMessage());
+        }
+    }
+
+    private void logout(Scanner scanner) {
+        try {
+            serverFacade.logout(this.authToken);
+        } catch (ServerFacade.ServerFacadeException message) {
+            System.out.println("ServerFacade.ServerFacadeException: " + message.getMessage());
+        } catch (Exception message) {
+            System.out.println("An unexpected error occurred while logging out: " + message.getMessage());
         }
     }
 
