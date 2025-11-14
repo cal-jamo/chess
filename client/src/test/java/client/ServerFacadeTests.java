@@ -21,9 +21,10 @@ public class ServerFacadeTests {
     @BeforeAll
     public static void init() {
         server = new Server();
-        port = server.run(0);
-        facade = new ServerFacade(port);
-        System.out.println("Started test HTTP server on " + port);
+        int port = server.run(0);
+        String serverUrl = "http://localhost:" + port;
+        facade = new ServerFacade(serverUrl);
+        System.out.println("Started test HTTP server on " + serverUrl);
     }
 
     @AfterAll

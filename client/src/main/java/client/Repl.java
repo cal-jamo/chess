@@ -57,7 +57,7 @@ public class Repl {
             case "quit":
                 break;
             case "login":
-                // login(scanner);
+                login(scanner);
                 break;
             case "register":
                 register(scanner);
@@ -88,25 +88,35 @@ public class Repl {
         } catch (Exception message) {
             System.out.println("An unexpected error occurred while registering: " + message.getMessage());
         }
+    }
 
+    private void login(Scanner scanner) {
+        try {
+            System.out.print("Enter username: ");
+            String username = scanner.nextLine();
+            System.out.print("Enter password: ");
+            String password = scanner.nextLine();
+
+            AuthData authSession = serverFacade.login(username, password);
+            this.authToken = authSession.authToken();
+            this.isLoggedIn = true;
+            System.out.println("\nLogin successful. You are now logged in " + username);
+        } catch (ServerFacade.ServerFacadeException message) {
+            System.out.println("ServerFacade.ServerFacadeException: " + message.getMessage());
+        } catch (Exception message) {
+            System.out.println("An unexpected error occurred while logging in: " + message.getMessage());
+        }
     }
 
     private void printPostLoginHelp() {
         System.out.println();
         System.out.println("Available commands:");
-        System.out.println("  help      - Show this message");
+        System.out.println("  help        - Show this message");
         System.out.println("  createGame  - Create a new game");
-        System.out.println("  joinGame     - Join an existing game");
-        System.out.println("  listGames     - List all available games");
-        System.out.println("  quit      - Exit the app");
+        System.out.println("  joinGame    - Join an existing game");
+        System.out.println("  listGames   - List all available games");
+        System.out.println("  quit        - Exit the app");
         System.out.println();
-
-    }
-
-
-
-    private void login(Scanner scanner) {
-
     }
 
     private void printPreLoginHelp() {
