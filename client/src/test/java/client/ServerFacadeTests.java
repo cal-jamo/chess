@@ -1,6 +1,6 @@
 package client;
 
-import serverFacade.ServerFacade;
+import facade.ServerFacade;
 import model.AuthData;
 import model.GameData;
 import org.junit.jupiter.api.*;

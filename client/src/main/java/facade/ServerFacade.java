@@ -1,4 +1,4 @@
-package serverFacade;
+package facade;
 import com.google.gson.Gson;
 import model.*;
 
