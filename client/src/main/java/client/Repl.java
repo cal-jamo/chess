@@ -185,7 +185,7 @@ public class Repl {
 
             serverFacade.joinGame(gameID, color, this.authToken);
             System.out.println("Successfully joined game " + gameToJoin.gameName() + " as " + color);
-            // call the implementation of the draw board here after I Implement it
+            // drawChessBoard(color);
         } catch (ServerFacade.ServerFacadeException message) {
             System.out.println("ServerFacade.ServerFacadeException: " + message.getMessage());
         } catch (Exception message) {
@@ -207,6 +207,26 @@ public class Repl {
             this.localGamesList.addAll(listOfGames);
         } catch (ServerFacade.ServerFacadeException e) {
             System.out.println("Failed to create game: " + e.getMessage());
+        }
+    }
+
+    private void observeGame(String[] tokens) {
+        try {
+            if (tokens.length < 2) {
+                System.out.println("Error: Please provide a game ID.");
+                System.out.println("Usage: observe <ID>");
+                return;
+            }
+            int gameNumber = Integer.parseInt(tokens[1]);
+            GameData gameToJoin = this.localGamesList.get(gameNumber - 1);
+            int gameID = gameToJoin.gameID();
+            serverFacade.joinGame(gameID, null, this.authToken); // null color = observe
+            System.out.println("Successfully observing game " + gameToJoin.gameName());
+            //drawChessboard("WHITE"); // Observers always joins from White's perspective
+        } catch (IndexOutOfBoundsException | NumberFormatException e) {
+            System.out.println("Error: Invalid game ID. Run 'list' to see available games.");
+        } catch (ServerFacade.ServerFacadeException e) {
+            System.out.println("Failed to observe game: " + e.getMessage());
         }
     }
 
