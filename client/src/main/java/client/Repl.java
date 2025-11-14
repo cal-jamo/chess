@@ -224,7 +224,7 @@ public class Repl {
             int gameNumber = Integer.parseInt(tokens[1]);
             GameData gameToJoin = this.localGamesList.get(gameNumber - 1);
             int gameID = gameToJoin.gameID();
-            serverFacade.joinGame(gameID, null, this.authToken);
+            serverFacade.joinGame(gameID, "", this.authToken);
             out.println("Successfully observing game " + gameToJoin.gameName());
             drawChessboard("WHITE");
         } catch (IndexOutOfBoundsException | NumberFormatException e) {

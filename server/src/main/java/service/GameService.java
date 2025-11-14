@@ -53,8 +53,10 @@ public class GameService {
         if (gameData == null) {
             throw new DataAccessException(ERROR_MAP.get(400));
         }
-
         if (playerColor == null) {
+            throw new DataAccessException(ERROR_MAP.get(400));
+        }
+        if (playerColor.isEmpty()) {
             return;
         }
         if ((!playerColor.equals("WHITE") && !playerColor.equals("BLACK"))) {
