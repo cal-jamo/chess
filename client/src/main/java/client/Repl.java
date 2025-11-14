@@ -55,6 +55,19 @@ public class Repl {
                 isLoggedIn = false;
                 this.authToken = null;
                 //logout(scanner);
+                break;
+            case "createGame":
+                //createGame();
+                break;
+            case "listGames":
+                //listGames();
+                break;
+            case "joinGame":
+                //joinGame();
+                break;
+            default:
+                System.out.println("Unknown command. Type 'help' for options.");
+                break;
         }
     }
 
