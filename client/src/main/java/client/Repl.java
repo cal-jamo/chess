@@ -1,6 +1,8 @@
 package client;
 import ServerFacade.ServerFacade;
+import model.AuthData;
 
+import java.rmi.ServerException;
 import java.util.Scanner;
 
 public class Repl {
@@ -58,12 +60,39 @@ public class Repl {
                 // login(scanner);
                 break;
             case "register":
-                // register(scanner);
+                register(scanner);
                 break;
             default:
                 System.out.println("Unknown command. Type 'help' for options.");
                 break;
         }
+    }
+
+    private void register(Scanner scanner) {
+        try {
+            System.out.print("Enter username: ");
+            String username = scanner.nextLine();
+            System.out.print("Enter password: ");
+            String password = scanner.nextLine();
+            System.out.print("Enter email: ");
+            String email = scanner.nextLine();
+
+            AuthData authData = serverFacade.register(username, password, email);
+
+            this.authToken = authData.authToken();
+            this.isLoggedIn = true;
+            System.out.println("\nRegistration successful. You are now logged in " + username);
+            // printPostLoginHelp(); we will implement this later
+        } catch (ServerFacade.ServerFacadeException message) {
+            System.out.println("ServerFacade.ServerFacadeException: " + message.getMessage());
+        } catch (Exception message) {
+            System.out.println("An unexpected error occurred while registering: " + message.getMessage());
+        }
+
+    }
+
+    private void login(Scanner scanner) {
+
     }
 
     private void printPreLoginHelp() {
