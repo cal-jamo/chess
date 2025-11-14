@@ -82,7 +82,7 @@ public class Repl {
             this.authToken = authData.authToken();
             this.isLoggedIn = true;
             System.out.println("\nRegistration successful. You are now logged in " + username);
-            // printPostLoginHelp(); we will implement this later
+            printPostLoginHelp();
         } catch (ServerFacade.ServerFacadeException message) {
             System.out.println("ServerFacade.ServerFacadeException: " + message.getMessage());
         } catch (Exception message) {
@@ -90,6 +90,20 @@ public class Repl {
         }
 
     }
+
+    private void printPostLoginHelp() {
+        System.out.println();
+        System.out.println("Available commands:");
+        System.out.println("  help      - Show this message");
+        System.out.println("  createGame  - Create a new game");
+        System.out.println("  joinGame     - Join an existing game");
+        System.out.println("  listGames     - List all available games");
+        System.out.println("  quit      - Exit the app");
+        System.out.println();
+
+    }
+
+
 
     private void login(Scanner scanner) {
 
