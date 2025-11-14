@@ -1,6 +1,5 @@
-package ServerFacade;
+package serverFacade;
 import com.google.gson.Gson;
-import com.sun.net.httpserver.Request;
 import model.*;
 
 import java.io.IOException;

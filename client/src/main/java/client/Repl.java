@@ -1,5 +1,5 @@
 package client;
-import ServerFacade.ServerFacade;
+import serverFacade.ServerFacade;
 import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
