@@ -152,7 +152,7 @@ public class ServiceTests {
         AuthData loginData = userService.loginUser(userToRegister);
         Assertions.assertNotNull(loginData.authToken());
         int gameCreated = gameService.createGame(loginData.authToken(), "testGame");
-        JoinRequest request = new JoinRequest(null, gameCreated);
+        JoinRequest request = new JoinRequest("", gameCreated);
         Assertions.assertThrows(DataAccessException.class, () -> gameService.joinGame(loginData.authToken(), request));
     }
     @Test
