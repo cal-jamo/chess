@@ -275,7 +275,7 @@ public class Repl {
         int startCol = (perspective == ChessGame.TeamColor.WHITE) ? 1 : 8;
         int endCol = (perspective == ChessGame.TeamColor.WHITE) ? 8 : 1;
         int colIncrement = (perspective == ChessGame.TeamColor.WHITE) ? 1 : -1;
-        for (int row = startRow; row != endRow - rowIncrement; row += rowIncrement) {
+        for (int row = startRow; row != endRow + rowIncrement; row += rowIncrement) {
             drawRowLabel(out, row);
             for (int col = startCol; col != endCol + colIncrement; col += colIncrement) {
                 boolean isLightSquare = (row + col) % 2 != 0;
