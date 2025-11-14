@@ -223,7 +223,6 @@ public class Repl {
             }
             int gameNumber = Integer.parseInt(tokens[1]);
             GameData gameToJoin = this.localGamesList.get(gameNumber - 1);
-            int gameID = gameToJoin.gameID();
             drawChessboard(gameToJoin, "WHITE");
         } catch (IndexOutOfBoundsException | NumberFormatException e) {
             out.println("Error: Invalid game ID. Run 'list' to see available games.");
