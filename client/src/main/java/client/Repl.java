@@ -32,7 +32,7 @@ public class Repl {
             if (isLoggedIn) {
                 handlePostLoginCommands(command, tokens, scanner);
             } else {
-                handlePreLoginCommands(command, tokens, scanner);
+                handlePreLoginCommands(command, scanner);
                 if (command.equals("quit")) {
                     break;
                 }
@@ -51,7 +51,7 @@ public class Repl {
                 isLoggedIn = false;
                 this.authToken = null;
                 this.localGamesList.clear();
-                logout(scanner);
+                logout();
                 break;
             case "create":
                 createGame(tokens);
@@ -62,8 +62,8 @@ public class Repl {
             case "join":
                 joinGame(tokens);
                 break;
-            case "observeGame":
-                //observeGame(scanner);
+            case "observe":
+                observeGame(tokens);
                 break;
             default:
                 System.out.println("Unknown command. Type 'help' for options.");
@@ -71,7 +71,7 @@ public class Repl {
         }
     }
 
-    private void handlePreLoginCommands(String command, String[] tokens, Scanner scanner) {
+    private void handlePreLoginCommands(String command, Scanner scanner) {
         switch (command) {
             case "help":
                 printPreLoginHelp();
@@ -132,7 +132,7 @@ public class Repl {
         }
     }
 
-    private void logout(Scanner scanner) {
+    private void logout() {
         try {
             serverFacade.logout(this.authToken);
         } catch (ServerFacade.ServerFacadeException message) {
@@ -220,7 +220,7 @@ public class Repl {
             int gameNumber = Integer.parseInt(tokens[1]);
             GameData gameToJoin = this.localGamesList.get(gameNumber - 1);
             int gameID = gameToJoin.gameID();
-            serverFacade.joinGame(gameID, null, this.authToken); // null color = observe
+            serverFacade.joinGame(gameID, "WHITE", this.authToken); // null color = observe
             System.out.println("Successfully observing game " + gameToJoin.gameName());
             //drawChessboard("WHITE"); // Observers always joins from White's perspective
         } catch (IndexOutOfBoundsException | NumberFormatException e) {
