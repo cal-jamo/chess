@@ -97,7 +97,9 @@ public class ServerFacade {
     public void joinGame(int gameID, String playerColor, String authToken) throws ServerFacadeException {
         var requestInfo = new java.util.HashMap<String, Object>();
         requestInfo.put("gameID", gameID);
-        requestInfo.put("playerColor", playerColor);
+        if (playerColor != null) {
+            requestInfo.put("playerColor", playerColor);
+        }
         makeRequest("PUT", "/game", requestInfo, authToken, null);
     }
 
