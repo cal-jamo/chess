@@ -110,7 +110,7 @@ public class Repl {
             listGames();
             printPostLoginHelp();
         } catch (ServerFacade.ServerFacadeException message) {
-            out.println("ServerFacade.ServerFacadeException: " + message.getMessage());
+            out.println(message.getMessage());
         } catch (Exception message) {
             out.println("An unexpected error occurred while registering: " + message.getMessage());
         }
@@ -129,7 +129,7 @@ public class Repl {
             out.println("\nLogin successful. You are now logged in " + username);
             listGames();
         } catch (ServerFacade.ServerFacadeException message) {
-            out.println("ServerFacade.ServerFacadeException: " + message.getMessage());
+            out.println(message.getMessage());
         } catch (Exception message) {
             out.println("An unexpected error occurred while logging in: " + message.getMessage());
         }
@@ -167,35 +167,51 @@ public class Repl {
                 }
             }
         } catch (ServerFacade.ServerFacadeException message) {
-            out.println("ServerFacade.ServerFacadeException: " + message.getMessage());
+            out.println(message.getMessage());
         } catch (Exception message) {
             out.println("An unexpected error occurred while logging out: " + message.getMessage());
         }
     }
 
     private void joinGame(String[] tokens) {
+        if (tokens.length != 3) {
+            out.println("Error: Incorrect number of arguments.");
+            out.println("Usage: join <COLOR> <ID>");
+            return;
+        }
+        String colorInput = tokens[1];
+        String idInput = tokens[2];
+        int gameNum;
         try {
-            if (tokens.length > 3) {
-                out.println("Error: Please provide a color and game ID.");
-                out.println("Usage: play <COLOR> <ID>");
-                return;
-            }
-            String color = tokens[1];
-            int gameNum = Integer.parseInt(tokens[2]);
-            if (!color.equals("WHITE") && !color.equals("BLACK")) {
-                out.println("Error: Invalid color. Please choose WHITE or BLACK.");
+            gameNum = Integer.parseInt(idInput);
+        } catch (NumberFormatException e) {
+            out.println("Error: Invalid Game ID. '" + idInput + "' is not a number.");
+            out.println("Usage: join <COLOR> <ID>");
+            return;
+        }
+        String color = colorInput.toUpperCase();
+        if (!color.equals("WHITE") && !color.equals("BLACK")) {
+            out.println("Error: Invalid color '" + colorInput + "'. Please choose WHITE or BLACK.");
+            return;
+        }
+        try {
+            if (gameNum <= 0 || gameNum > this.localGamesList.size()) {
+                out.println("Error: Game ID " + gameNum + " does not exist or is not available.");
+                out.println("Run 'list' to see available games.");
                 return;
             }
             GameData gameToJoin = this.localGamesList.get(gameNum - 1);
             int gameID = gameToJoin.gameID();
 
             serverFacade.joinGame(gameID, color, this.authToken);
+
             out.println("Successfully joined game " + gameToJoin.gameName() + " as " + color);
             drawChessboard(gameToJoin, color);
+
         } catch (ServerFacade.ServerFacadeException message) {
-            out.println("ServerFacade.ServerFacadeException: " + message.getMessage());
-        } catch (Exception message) {
-            out.println("An unexpected error occurred while joining game: " + message.getMessage());
+            out.println(message.getMessage());
+        } catch (Exception e) {
+            out.println("An unexpected system error occurred: " + e.getMessage());
         }
     }
 
@@ -208,7 +224,7 @@ public class Repl {
             }
             String gameName = tokens[1];
             GameData game = serverFacade.createGame(gameName, this.authToken);
-            out.println("Game created: " + game.gameName() + " (ID: " + game.gameID() + ")");
+            out.println("Game created: " + game.gameName());
         } catch (ServerFacade.ServerFacadeException e) {
             out.println("Failed to create game: " + e.getMessage());
         }
