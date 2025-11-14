@@ -123,4 +123,10 @@ public class Server {
     public void stop() {
         javalin.stop();
     }
+
+    public static void main(String[] args) {
+        Server server = new Server();
+        server.run(8080);
+        System.out.println("Server started on port 8080.");
+    }
 }
