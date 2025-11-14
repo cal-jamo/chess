@@ -56,7 +56,7 @@ public class Repl {
             case "create":
                 createGame(tokens);
                 break;
-            case "listGames":
+            case "list":
                 listGames();
                 break;
             case "joinGame":
