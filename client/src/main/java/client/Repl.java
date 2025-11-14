@@ -1,10 +1,17 @@
 package client;
+import ServerFacade.ServerFacade;
+
 import java.util.Scanner;
 
 public class Repl {
     private boolean isLoggedIn = false;
+    private final ServerFacade serverFacade;
 
-    public static void main(String[] args) {
+    public Repl(String serverUrl) {
+        this.serverFacade = new ServerFacade(serverUrl);
+    }
+
+    public void run() {
         System.out.println("♕ Welcome to Chess. Type 'help' to get started.");
         Scanner scanner = new Scanner(System.in);
         while (true) {
