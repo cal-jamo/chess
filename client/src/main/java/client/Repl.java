@@ -37,7 +37,7 @@ public class Repl {
                     System.out.println("Post-login commands not implemented yet.");
                 }
             } else {
-                // handlePreloginCommands(command, tokens, scanner);
+                handlePreLoginCommands(command, tokens, scanner);
                 if (command.equals("quit")) {
                     break;
                 }
@@ -45,5 +45,34 @@ public class Repl {
         }
         scanner.close();
         System.out.println("Exiting Chess.");
+    }
+
+    private void handlePreLoginCommands(String command, String[] tokens, Scanner scanner) {
+        switch (command) {
+            case "help":
+                printPreLoginHelp();
+                break;
+            case "quit":
+                break;
+            case "login":
+                // login(scanner);
+                break;
+            case "register":
+                // register(scanner);
+                break;
+            default:
+                System.out.println("Unknown command. Type 'help' for options.");
+                break;
+        }
+    }
+
+    private void printPreLoginHelp() {
+        System.out.println();
+        System.out.println("Available commands:");
+        System.out.println("  help      - Show this message");
+        System.out.println("  register  - Create your new account");
+        System.out.println("  login     - Log in to your existing account");
+        System.out.println("  quit      - Exit the app");
+        System.out.println();
     }
 }
