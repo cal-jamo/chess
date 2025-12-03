@@ -16,9 +16,12 @@ import service.GameService;
 import service.ResetService;
 import service.UserService;
 import model.JoinRequest;
+import webSocket.WebSocketHandler;
+
 import java.util.Collection;
 public class Server {
     private final Javalin javalin;
+    private final WebSocketHandler webSocketHandler = new WebSocketHandler();
     public Server() {
         javalin = Javalin.create(config -> {
             config.staticFiles.add("web");
@@ -50,6 +53,9 @@ public class Server {
             } catch (DataAccessException e) {
                 req.status(500).json(java.util.Map.of("message", String.format("Error: %s", e.getMessage())));
             }
+        });
+        javalin.ws("/ws", ws -> {
+            ws.onMessage(webSocketHandler::handleMessage);
         });
         javalin.post("/user", (req) -> {
             try {
