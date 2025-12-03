@@ -6,4 +6,7 @@ public class ConnectionManager {
     public void add(String authToken, Connection connection) {
         sessions.put(authToken, connection);
     }
+    public void remove(String authToken) {
+        sessions.remove(authToken);
+    }
 }
