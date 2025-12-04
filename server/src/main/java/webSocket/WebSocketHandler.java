@@ -13,7 +13,10 @@ import websocket.commands.MakeMoveCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
-import websocket.messages.ServerMessage;
+import chess.ChessGame;
+import chess.InvalidMoveException;
+import chess.ChessMove;
+
 
 public class WebSocketHandler {
     private final ConnectionManager sessions = new ConnectionManager();
@@ -36,7 +39,7 @@ public class WebSocketHandler {
                 case CONNECT -> connect(command.getAuthToken(), command.getGameID(), cx);
                 case MAKE_MOVE -> {
                     MakeMoveCommand moveCommand = gson.fromJson(message, MakeMoveCommand.class);
-                    System.out.println("Make Move command received");
+                    makeMove(moveCommand.getAuthToken(), moveCommand.getGameID(), moveCommand.getMove(), cx);
                 }
                 case LEAVE -> System.out.println("Leave command received");
                 case RESIGN -> System.out.println("Resign command received");
@@ -45,6 +48,10 @@ public class WebSocketHandler {
             ErrorMessage errorMessage = new ErrorMessage("Error: " + e.getMessage());
             cx.send(gson.toJson(errorMessage));
         }
+    }
+
+    private void makeMove(String authToken, Integer gameID, ChessMove move, WsMessageContext cx) {
+
     }
 
     private void connect(String authToken, Integer gameId, WsMessageContext cx) throws Exception {
@@ -56,13 +63,10 @@ public class WebSocketHandler {
         if (gameData == null) {
             throw new DataAccessException("Bad game ID");
         }
-
         var connection = new Connection(authToken, cx.session, gameId);
         sessions.add(authToken, connection);
-
         LoadGameMessage loadGame = new LoadGameMessage(gameData.game());
         cx.send(gson.toJson(loadGame));
-
         NotificationMessage notification = new NotificationMessage(authData.username() + " joined the game");
         sessions.broadcast(notification, authToken, gameId);
     }
