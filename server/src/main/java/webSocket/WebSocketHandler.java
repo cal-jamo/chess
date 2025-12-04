@@ -44,7 +44,9 @@ public class WebSocketHandler {
                     makeMove(moveCommand.getAuthToken(), moveCommand.getGameID(), moveCommand.getMove(), cx);
                 }
                 case LEAVE -> System.out.println("Leave command received");
-                case RESIGN -> System.out.println("Resign command received");
+                case RESIGN -> {
+                    resign(command.getAuthToken(), command.getGameID());
+                }
             }
         } catch (Exception e) {
             ErrorMessage errorMessage = new ErrorMessage("Error: " + e.getMessage());
@@ -63,6 +65,9 @@ public class WebSocketHandler {
         }
         String username = authData.username();
         ChessGame currGame = gameData.game();
+        if (currGame.isGameOver() || currGame.isInCheckmate(currGame.getTeamTurn()) || currGame.isInStalemate(currGame.getTeamTurn())) {
+            throw new DataAccessException("Error: Game is over");
+        }
         if (currGame.isInCheckmate(currGame.getTeamTurn()) || currGame.isInStalemate(currGame.getTeamTurn())) {
             throw new DataAccessException("Error: Game is over");
         }
@@ -114,6 +119,31 @@ public class WebSocketHandler {
                 throw new IOException("Error: " + e.getMessage());
             }
         }
+    }
+
+    private void resign(String authToken, Integer gameID) throws Exception {
+        AuthData authData = authDAO.getAuth(authToken);
+        if (authData == null) throw new DataAccessException("Bad auth token");
+        GameData gameData = gameDAO.getGame(gameID);
+        if (gameData == null) throw new DataAccessException("Bad game ID");
+
+        ChessGame currGame = gameData.game();
+        String username = authData.username();
+
+        if (!username.equals(gameData.whiteUsername()) && !username.equals(gameData.blackUsername())) {
+            throw new DataAccessException("Error: Observer cannot resign");
+        }
+
+        if (currGame.isGameOver()) {
+            throw new DataAccessException("Error: Game is already over");
+        }
+
+        currGame.setGameOver(true);
+        GameData updatedGame = new GameData(gameID, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), currGame);
+        gameDAO.updateGame(gameID, updatedGame);
+
+        NotificationMessage notification = new NotificationMessage(username + " resigned the game");
+        sessions.broadcast(notification, null, gameID); // Pass null to send to EVERYONE
     }
 
     private void connect(String authToken, Integer gameId, WsMessageContext cx) throws Exception {

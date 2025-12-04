@@ -12,6 +12,7 @@ import java.util.Objects;
  */
 public class ChessGame {
 
+    private Boolean gameOver = false;
     private ChessBoard board;
     private TeamColor currentTurn;
 
@@ -241,7 +242,12 @@ public class ChessGame {
         }
         return false;
     }
-
+    public void setGameOver(boolean gameOver) {
+        this.gameOver = gameOver;
+    }
+    public boolean isGameOver() {
+        return gameOver;
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) {
