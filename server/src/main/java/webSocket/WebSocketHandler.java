@@ -63,6 +63,9 @@ public class WebSocketHandler {
         }
         String username = authData.username();
         ChessGame currGame = gameData.game();
+        if (currGame.isInCheckmate(currGame.getTeamTurn()) || currGame.isInStalemate(currGame.getTeamTurn())) {
+            throw new DataAccessException("Error: Game is over");
+        }
         ChessGame.TeamColor currColor = currGame.getBoard().getPiece(move.getStartPosition()).getTeamColor();
         if (currColor == ChessGame.TeamColor.BLACK) {
             if (!username.equals(gameData.blackUsername())) {
@@ -81,6 +84,7 @@ public class WebSocketHandler {
             throw new DataAccessException("Error: " + e.getMessage());
         }
         GameData gameAfterMove = new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), currGame);
+        gameDAO.updateGame(gameAfterMove.gameID(), gameAfterMove);
         LoadGameMessage loadGame = new LoadGameMessage(currGame);
         try {
             sessions.broadcast(loadGame, null, gameID);
@@ -93,6 +97,25 @@ public class WebSocketHandler {
             sessions.broadcast(noti, authToken, gameID);
         } catch (Exception e) {
             throw new IOException("Error: " + e.getMessage());
+        }
+
+        ChessGame.TeamColor opponentColor = currGame.getTeamTurn();
+
+        String opponentUsername = (opponentColor == ChessGame.TeamColor.WHITE) ? gameData.whiteUsername() : gameData.blackUsername();
+        if (currGame.isInCheckmate(opponentColor)) {
+            NotificationMessage checkmateNoti = new NotificationMessage(opponentUsername + " is in CHECKMATE");
+            try {
+                sessions.broadcast(checkmateNoti, authToken, gameID);
+            } catch (Exception e) {
+                throw new IOException("Error: " + e.getMessage());
+            }
+        } else if (currGame.isInCheck(opponentColor)) {
+            NotificationMessage checkNoti = new NotificationMessage(opponentUsername + " is in CHECK");
+            try {
+                sessions.broadcast(checkNoti, authToken, gameID);
+            } catch (Exception e) {
+                throw new IOException("Error: " + e.getMessage());
+            }
         }
     }
 
