@@ -252,7 +252,7 @@ public class Repl {
         out.println("  logout        - Log out and return to pre-login");
         out.println("  create <NAME> - Create a new game");
         out.println("  list          - List all available games");
-        out.println("  play <COLOR> <ID> - Join a game as WHITE or BLACK");
+        out.println("  join <COLOR> <ID> - Join a game as WHITE or BLACK");
         out.println("  observe <ID>  - Join a game as an observer");
         out.println();
     }
