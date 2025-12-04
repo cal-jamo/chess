@@ -4,6 +4,7 @@ import io.javalin.websocket.WsMessageContext;
 import websocket.commands.UserGameCommand;
 import websocket.commands.MakeMoveCommand;
 
+
 public class WebSocketHandler {
     private final ConnectionManager sessions =  new ConnectionManager();
     private final Gson gson = new Gson();
