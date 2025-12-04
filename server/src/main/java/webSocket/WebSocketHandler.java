@@ -17,6 +17,8 @@ import chess.ChessGame;
 import chess.InvalidMoveException;
 import chess.ChessMove;
 
+import java.io.IOException;
+
 
 public class WebSocketHandler {
     private final ConnectionManager sessions = new ConnectionManager();
@@ -50,8 +52,48 @@ public class WebSocketHandler {
         }
     }
 
-    private void makeMove(String authToken, Integer gameID, ChessMove move, WsMessageContext cx) {
+    private void makeMove(String authToken, Integer gameID, ChessMove move, WsMessageContext cx) throws Exception {
+        GameData gameData = gameDAO.getGame(gameID);
+        AuthData authData = authDAO.getAuth(authToken);
+        if (authData == null) {
+            throw new DataAccessException("Bad auth token");
+        }
+        if (gameData == null) {
+            throw new DataAccessException("Bad gameID");
+        }
+        String username = authData.username();
+        ChessGame currGame = gameData.game();
+        ChessGame.TeamColor currColor = currGame.getBoard().getPiece(move.getStartPosition()).getTeamColor();
+        if (currColor == ChessGame.TeamColor.BLACK) {
+            if (!username.equals(gameData.blackUsername())) {
+                throw new DataAccessException("Error: This piece isn't on your team");
+            }
+        } else if (currColor == ChessGame.TeamColor.WHITE) {
+            if (!username.equals(gameData.whiteUsername())) {
+                throw new DataAccessException("Error: This piece isn't on your team");
+            }
+        } else {
+            throw new DataAccessException("Error: You can't move this piece");
+        }
+        try {
+            currGame.makeMove(move);
+        } catch (InvalidMoveException e) {
+            throw new DataAccessException("Error: " + e.getMessage());
+        }
+        GameData gameAfterMove = new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), currGame);
+        LoadGameMessage loadGame = new LoadGameMessage(currGame);
+        try {
+            sessions.broadcast(loadGame, null, gameID);
+        } catch (Exception e) {
+            throw new IOException("Error: " + e.getMessage());
+        }
 
+        NotificationMessage noti = new NotificationMessage(username + " made move " + move.toString());
+        try {
+            sessions.broadcast(noti, authToken, gameID);
+        } catch (Exception e) {
+            throw new IOException("Error: " + e.getMessage());
+        }
     }
 
     private void connect(String authToken, Integer gameId, WsMessageContext cx) throws Exception {
