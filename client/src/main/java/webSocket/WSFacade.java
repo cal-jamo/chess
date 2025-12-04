@@ -3,6 +3,9 @@ package webSocket;
 import com.google.gson.Gson;
 import jakarta.websocket.*;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
@@ -24,9 +27,9 @@ public class WSFacade extends Endpoint {
                 public void onMessage(String message) {
                     ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
                     switch (serverMessage.getServerMessageType()) {
-                        case LOAD_GAME -> notiHandler.notify(serverMessage);
-                        case NOTIFICATION -> notiHandler.notify(serverMessage);
-                        case ERROR -> notiHandler.notify(serverMessage);
+                        case LOAD_GAME -> notiHandler.notify(new Gson().fromJson(message, LoadGameMessage.class));
+                        case NOTIFICATION -> notiHandler.notify(new Gson().fromJson(message, NotificationMessage.class));
+                        case ERROR -> notiHandler.notify(new Gson().fromJson(message, ErrorMessage.class));
                     }
                 }
             });
