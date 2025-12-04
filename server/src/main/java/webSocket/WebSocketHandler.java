@@ -50,6 +50,7 @@ public class WebSocketHandler {
                     resign(command.getAuthToken(), command.getGameID());
                 }
             }
+
         } catch (Exception e) {
             ErrorMessage errorMessage = new ErrorMessage("Error: " + e.getMessage());
             cx.send(gson.toJson(errorMessage));
