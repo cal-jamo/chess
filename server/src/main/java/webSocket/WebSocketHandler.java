@@ -50,7 +50,6 @@ public class WebSocketHandler {
                     resign(command.getAuthToken(), command.getGameID());
                 }
             }
-
         } catch (Exception e) {
             ErrorMessage errorMessage = new ErrorMessage("Error: " + e.getMessage());
             cx.send(gson.toJson(errorMessage));
@@ -152,6 +151,16 @@ public class WebSocketHandler {
         sessions.remove(authToken);
         NotificationMessage notification = new NotificationMessage(authData.username() + " left the game");
         sessions.broadcast(notification, authToken, gameID);
+        String username = authData.username();
+        GameData updatedGame = null;
+        if (username.equals(gameData.whiteUsername())) {
+            updatedGame = new GameData(gameID, null, gameData.blackUsername(), gameData.gameName(), gameData.game());
+        } else if (username.equals(gameData.blackUsername())) {
+            updatedGame = new GameData(gameID, gameData.whiteUsername(), null, gameData.gameName(), gameData.game());
+        }
+        if (updatedGame != null) {
+            gameDAO.updateGame(gameID, updatedGame);
+        }
     }
 
     private void connect(String authToken, Integer gameId, WsMessageContext cx) throws Exception {
