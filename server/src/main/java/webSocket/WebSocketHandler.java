@@ -91,28 +91,25 @@ public class WebSocketHandler {
         } catch (Exception e) {
             throw new IOException("Error: " + e.getMessage());
         }
-
+        ChessGame.TeamColor opponentColor = currGame.getTeamTurn();
+        String opponentUsername = (opponentColor == ChessGame.TeamColor.WHITE) ? gameData.whiteUsername() : gameData.blackUsername();
         NotificationMessage noti = new NotificationMessage(username + " made move " + move.toString());
         try {
             sessions.broadcast(noti, authToken, gameID);
         } catch (Exception e) {
             throw new IOException("Error: " + e.getMessage());
         }
-
-        ChessGame.TeamColor opponentColor = currGame.getTeamTurn();
-
-        String opponentUsername = (opponentColor == ChessGame.TeamColor.WHITE) ? gameData.whiteUsername() : gameData.blackUsername();
         if (currGame.isInCheckmate(opponentColor)) {
             NotificationMessage checkmateNoti = new NotificationMessage(opponentUsername + " is in CHECKMATE");
             try {
-                sessions.broadcast(checkmateNoti, authToken, gameID);
+                sessions.broadcast(checkmateNoti, null, gameID);
             } catch (Exception e) {
                 throw new IOException("Error: " + e.getMessage());
             }
         } else if (currGame.isInCheck(opponentColor)) {
             NotificationMessage checkNoti = new NotificationMessage(opponentUsername + " is in CHECK");
             try {
-                sessions.broadcast(checkNoti, authToken, gameID);
+                sessions.broadcast(checkNoti, null, gameID);
             } catch (Exception e) {
                 throw new IOException("Error: " + e.getMessage());
             }
