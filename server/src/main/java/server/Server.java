@@ -21,7 +21,7 @@ import webSocket.WebSocketHandler;
 import java.util.Collection;
 public class Server {
     private final Javalin javalin;
-    private final WebSocketHandler webSocketHandler = new WebSocketHandler();
+    private final WebSocketHandler webSocketHandler;
     public Server() {
         javalin = Javalin.create(config -> {
             config.staticFiles.add("web");
@@ -43,6 +43,7 @@ public class Server {
         AuthDAO authDAO = new DBAuthDAO();
         UserDAO userDAO = new DBUserDAO();
         GameDAO gameDAO = new DBGameDAO();
+        webSocketHandler = new WebSocketHandler(userDAO, authDAO, gameDAO);
         ResetService resetService = new ResetService(userDAO, authDAO, gameDAO);
         UserService userService = new UserService(userDAO, authDAO, gameDAO);
         GameService gameService = new GameService(authDAO, gameDAO);
