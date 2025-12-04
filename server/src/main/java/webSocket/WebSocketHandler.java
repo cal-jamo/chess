@@ -43,7 +43,9 @@ public class WebSocketHandler {
                     MakeMoveCommand moveCommand = gson.fromJson(message, MakeMoveCommand.class);
                     makeMove(moveCommand.getAuthToken(), moveCommand.getGameID(), moveCommand.getMove(), cx);
                 }
-                case LEAVE -> System.out.println("Leave command received");
+                case LEAVE -> {
+                    leave(command.getAuthToken(), command.getGameID());
+                }
                 case RESIGN -> {
                     resign(command.getAuthToken(), command.getGameID());
                 }
@@ -126,24 +128,29 @@ public class WebSocketHandler {
         if (authData == null) throw new DataAccessException("Bad auth token");
         GameData gameData = gameDAO.getGame(gameID);
         if (gameData == null) throw new DataAccessException("Bad game ID");
-
         ChessGame currGame = gameData.game();
         String username = authData.username();
-
         if (!username.equals(gameData.whiteUsername()) && !username.equals(gameData.blackUsername())) {
             throw new DataAccessException("Error: Observer cannot resign");
         }
-
         if (currGame.isGameOver()) {
             throw new DataAccessException("Error: Game is already over");
         }
-
         currGame.setGameOver(true);
         GameData updatedGame = new GameData(gameID, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), currGame);
         gameDAO.updateGame(gameID, updatedGame);
-
         NotificationMessage notification = new NotificationMessage(username + " resigned the game");
         sessions.broadcast(notification, null, gameID); // Pass null to send to EVERYONE
+    }
+
+    private void leave(String authToken, Integer gameID) throws Exception {
+        AuthData authData = authDAO.getAuth(authToken);
+        if (authData == null) throw new DataAccessException("Bad auth token");
+        GameData gameData = gameDAO.getGame(gameID);
+        if (gameData == null) throw new DataAccessException("Bad game ID");
+        sessions.remove(authToken);
+        NotificationMessage notification = new NotificationMessage(authData.username() + " left the game");
+        sessions.broadcast(notification, authToken, gameID);
     }
 
     private void connect(String authToken, Integer gameId, WsMessageContext cx) throws Exception {
