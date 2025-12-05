@@ -88,10 +88,10 @@ public class Repl implements NotiHandler {
             chess.ChessPosition endPos = parsePos(end);
             ChessPiece.PieceType promotionPiece = null;
             if (promotion != null) {
-                if (promotion.equalsIgnoreCase("QUEEN")) promotionPiece = ChessPiece.PieceType.QUEEN;
-                else if (promotion.equalsIgnoreCase("ROOK")) promotionPiece = ChessPiece.PieceType.ROOK;
-                else if (promotion.equalsIgnoreCase("KNIGHT")) promotionPiece = ChessPiece.PieceType.KNIGHT;
-                else if (promotion.equalsIgnoreCase("BISHOP")) promotionPiece = ChessPiece.PieceType.BISHOP;
+                if (promotion.equalsIgnoreCase("QUEEN")) { promotionPiece = ChessPiece.PieceType.QUEEN;}
+                else if (promotion.equalsIgnoreCase("ROOK")) { promotionPiece = ChessPiece.PieceType.ROOK;}
+                else if (promotion.equalsIgnoreCase("KNIGHT")) { promotionPiece = ChessPiece.PieceType.KNIGHT;}
+                else if (promotion.equalsIgnoreCase("BISHOP")) { promotionPiece = ChessPiece.PieceType.BISHOP;}
             }
             chess.ChessMove move = new chess.ChessMove(startPos, endPos, promotionPiece);
             wsFacade.sendCommand(new websocket.commands.MakeMoveCommand(authToken, gameJoinedId, move));
@@ -180,12 +180,12 @@ public class Repl implements NotiHandler {
         }
     }
     private chess.ChessPosition parsePos(String pos) throws Exception {
-        if (pos.length() != 2) throw new Exception("Invalid position: " + pos);
+        if (pos.length() != 2) { throw new Exception("Invalid position: " + pos); }
         char colChar = pos.charAt(0);
         char rowChar = pos.charAt(1);
         int col = colChar - 'a' + 1;
         int row = rowChar - '1' + 1;
-        if (col < 1 || col > 8 || row < 1 || row > 8) throw new Exception("Position out of bounds: " + pos);
+        if (col < 1 || col > 8 || row < 1 || row > 8) { throw new Exception("Position out of bounds: " + pos); }
         return new chess.ChessPosition(row, col);
     }
     private void handlePreLoginCommands(String command, Scanner scanner) {

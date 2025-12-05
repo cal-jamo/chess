@@ -135,9 +135,9 @@ public class WebSocketHandler {
 
     private void resign(String authToken, Integer gameID) throws Exception {
         AuthData authData = authDAO.getAuth(authToken);
-        if (authData == null) throw new DataAccessException("Bad auth token");
+        if (authData == null) { throw new DataAccessException("Bad auth token");}
         GameData gameData = gameDAO.getGame(gameID);
-        if (gameData == null) throw new DataAccessException("Bad game ID");
+        if (gameData == null) { throw new DataAccessException("Bad game ID");}
         ChessGame currGame = gameData.game();
         String username = authData.username();
         if (!username.equals(gameData.whiteUsername()) && !username.equals(gameData.blackUsername())) {
@@ -155,9 +155,9 @@ public class WebSocketHandler {
 
     private void leave(String authToken, Integer gameID) throws Exception {
         AuthData authData = authDAO.getAuth(authToken);
-        if (authData == null) throw new DataAccessException("Bad auth token");
+        if (authData == null) { throw new DataAccessException("Bad auth token"); }
         GameData gameData = gameDAO.getGame(gameID);
-        if (gameData == null) throw new DataAccessException("Bad game ID");
+        if (gameData == null) { throw new DataAccessException("Bad game ID"); }
         sessions.remove(authToken);
         NotificationMessage notification = new NotificationMessage(authData.username() + " left the game");
         sessions.broadcast(notification, authToken, gameID);
