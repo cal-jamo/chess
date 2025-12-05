@@ -1,4 +1,5 @@
 package client;
+import chess.ChessPiece;
 import facade.ServerFacade;
 import chess.ChessGame;
 import model.AuthData;
@@ -27,6 +28,7 @@ public class Repl implements NotiHandler {
     private WSFacade wsFacade;
     private final String serverUrl;
     private ChessGame.TeamColor playerColor;
+    private Integer gameJoinedId;
 
 
 
@@ -80,10 +82,57 @@ public class Repl implements NotiHandler {
             case "observe":
                 observeGame(tokens);
                 break;
+            case "leave":
+                leave();
+                break;
+            case "move":
+                movePiece(tokens);
+                break;
+            case "redraw":
+                redraw();
+                break;
             default:
                 out.println("Unknown command. Type 'help' for options.");
                 break;
         }
+    }
+
+    private void movePiece(String[] tokens) {
+        try {
+            if (tokens.length > 3) {
+                out.println("Error: Usage: move <Start Pos> <End Pos> [Promotion]");
+                return;
+            }
+            if(gameJoinedId == null) {
+                out.println("Error: Please join a game");
+            }
+            String start = tokens[1];
+            String end = tokens[2];
+            String promotion = (tokens.length > 3) ? tokens[3] : null;
+            chess.ChessPosition startPos = parsePos(start);
+            chess.ChessPosition endPos = parsePos(end);
+            ChessPiece.PieceType promotionPiece = null;
+            if (promotion != null) {
+                if (promotion.equalsIgnoreCase("QUEEN")) promotionPiece = ChessPiece.PieceType.QUEEN;
+                else if (promotion.equalsIgnoreCase("ROOK")) promotionPiece = ChessPiece.PieceType.ROOK;
+                else if (promotion.equalsIgnoreCase("KNIGHT")) promotionPiece = ChessPiece.PieceType.KNIGHT;
+                else if (promotion.equalsIgnoreCase("BISHOP")) promotionPiece = ChessPiece.PieceType.BISHOP;
+            }
+            chess.ChessMove move = new chess.ChessMove(startPos, endPos, promotionPiece);
+            wsFacade.sendCommand(new websocket.commands.MakeMoveCommand(authToken, gameJoinedId, move));
+            out.println("Move sent!");
+        } catch (Exception e) {
+            out.println("Error: " + e.getMessage());
+        }
+    }
+    private chess.ChessPosition parsePos(String pos) throws Exception {
+        if (pos.length() != 2) throw new Exception("Invalid position: " + pos);
+        char colChar = pos.charAt(0);
+        char rowChar = pos.charAt(1);
+        int col = colChar - 'a' + 1;
+        int row = rowChar - '1' + 1;
+        if (col < 1 || col > 8 || row < 1 || row > 8) throw new Exception("Position out of bounds: " + pos);
+        return new chess.ChessPosition(row, col);
     }
 
     private void handlePreLoginCommands(String command, Scanner scanner) {
@@ -222,6 +271,7 @@ public class Repl implements NotiHandler {
             } else {
                 this.playerColor = ChessGame.TeamColor.BLACK;
             }
+            this.gameJoinedId = gameID;
             this.wsFacade = new WSFacade(this, serverUrl);
             wsFacade.sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID));
 
@@ -257,6 +307,7 @@ public class Repl implements NotiHandler {
             int gameNumber = Integer.parseInt(tokens[1]);
             GameData gameToJoin = this.localGamesList.get(gameNumber - 1);
             this.playerColor = ChessGame.TeamColor.WHITE;
+            this.gameJoinedId = gameToJoin.gameID();
             try {
                 this.wsFacade = new WSFacade(this, serverUrl);
                 wsFacade.sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameToJoin.gameID()));
@@ -277,6 +328,9 @@ public class Repl implements NotiHandler {
         out.println("  list          - List all available games");
         out.println("  join <COLOR> <ID> - Join a game as WHITE or BLACK");
         out.println("  observe <ID>  - Join a game as an observer");
+        out.println("  redraw        - Redraw a board");
+        out.println("  leave        - Leave a game");
+        out.println("  move <e2> <e4>   - Move a piece from one spot to another");
         out.println();
     }
     private void printPreLoginHelp() {
