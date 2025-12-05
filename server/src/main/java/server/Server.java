@@ -16,7 +16,7 @@ import service.GameService;
 import service.ResetService;
 import service.UserService;
 import model.JoinRequest;
-import webSocket.WebSocketHandler;
+import websocket.WebSocketHandler;
 
 import java.util.Collection;
 public class Server {

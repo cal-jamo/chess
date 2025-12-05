@@ -1,4 +1,4 @@
-package webSocket;
+package websocket;
 
 import com.google.gson.Gson;
 import websocket.commands.UserGameCommand;
@@ -21,7 +21,7 @@ import java.net.URISyntaxException;
 public class WSFacade extends Endpoint {
     Session session;
     NotiHandler notiHandler;
-    public WSFacade(Session session, NotiHandler notiHandler, String url) throws Exception {
+    public WSFacade(NotiHandler notiHandler, String url) throws Exception {
         try {
             url = url.replace("http", "ws");
             URI uri = new URI(url + "/ws");

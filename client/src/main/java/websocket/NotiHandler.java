@@ -1,4 +1,4 @@
-package webSocket;
+package websocket;
 import websocket.messages.ServerMessage;
 
 public interface NotiHandler {

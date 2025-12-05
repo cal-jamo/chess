@@ -1,4 +1,4 @@
-package webSocket;
+package websocket;
 import com.google.gson.Gson;
 import websocket.messages.ServerMessage;
 import java.io.IOException;
