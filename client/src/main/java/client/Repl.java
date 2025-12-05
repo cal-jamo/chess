@@ -26,6 +26,7 @@ public class Repl implements NotiHandler {
     private List<GameData> localGamesList = new ArrayList<>();
     private WSFacade wsFacade;
     private final String serverUrl;
+    private ChessGame.TeamColor playerColor;
 
 
 
@@ -216,6 +217,11 @@ public class Repl implements NotiHandler {
 
             serverFacade.joinGame(gameID, color, this.authToken);
             out.println("Successfully joined game " + gameToJoin.gameName() + " as " + color);
+            if (color.equalsIgnoreCase("WHITE")) {
+                this.playerColor = ChessGame.TeamColor.WHITE;
+            } else {
+                this.playerColor = ChessGame.TeamColor.BLACK;
+            }
             this.wsFacade = new WSFacade(this, serverUrl);
             wsFacade.sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID));
 
@@ -250,6 +256,7 @@ public class Repl implements NotiHandler {
             }
             int gameNumber = Integer.parseInt(tokens[1]);
             GameData gameToJoin = this.localGamesList.get(gameNumber - 1);
+            this.playerColor = ChessGame.TeamColor.WHITE;
             try {
                 this.wsFacade = new WSFacade(this, serverUrl);
                 wsFacade.sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameToJoin.gameID()));
@@ -377,7 +384,7 @@ public class Repl implements NotiHandler {
             case LOAD_GAME -> {
                 LoadGameMessage loadGame = (LoadGameMessage) message;
                 out.println();
-                drawBoardInternal(new PrintStream(System.out, true, StandardCharsets.UTF_8), loadGame.getGame().getBoard(), ChessGame.TeamColor.WHITE);
+                drawBoardInternal(new PrintStream(System.out, true, StandardCharsets.UTF_8), loadGame.getGame().getBoard(), this.playerColor);
                 out.print("\n[LOGGED_IN] >>> ");
             }
             case NOTIFICATION -> {

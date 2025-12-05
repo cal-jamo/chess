@@ -18,6 +18,7 @@ import chess.InvalidMoveException;
 import chess.ChessMove;
 
 import java.io.IOException;
+import java.util.Objects;
 
 
 public class WebSocketHandler {
@@ -164,19 +165,31 @@ public class WebSocketHandler {
     }
 
     private void connect(String authToken, Integer gameId, WsMessageContext cx) throws Exception {
-        AuthData authData = authDAO.getAuth(authToken);
-        if (authData == null) {
-            throw new DataAccessException("Bad auth token");
+        try {
+            AuthData authData = authDAO.getAuth(authToken);
+            if (authData == null) {
+                throw new DataAccessException("Bad auth token");
+            }
+            GameData gameData = gameDAO.getGame(gameId);
+            if (gameData == null) {
+                throw new DataAccessException("Bad game ID");
+            }
+            var connection = new Connection(authToken, cx.session, gameId);
+            sessions.add(authToken, connection);
+            LoadGameMessage loadGame = new LoadGameMessage(gameData.game());
+            cx.send(gson.toJson(loadGame));
+            String message;
+            if (Objects.equals(authData.username(), gameData.whiteUsername())) {
+                message = String.format("%s joined as White", authData.username());
+            } else if (Objects.equals(authData.username(), gameData.blackUsername())) {
+                message = String.format("%s joined as Black", authData.username());
+            } else {
+                message = String.format("%s joined as observer", authData.username());
+            }
+            var notification = new NotificationMessage(message);
+            sessions.broadcast(notification, authToken, gameId);
+        } catch (Exception e) {
+            throw new DataAccessException("Error: " + e.getMessage());
         }
-        GameData gameData = gameDAO.getGame(gameId);
-        if (gameData == null) {
-            throw new DataAccessException("Bad game ID");
-        }
-        var connection = new Connection(authToken, cx.session, gameId);
-        sessions.add(authToken, connection);
-        LoadGameMessage loadGame = new LoadGameMessage(gameData.game());
-        cx.send(gson.toJson(loadGame));
-        NotificationMessage notification = new NotificationMessage(authData.username() + " joined the game");
-        sessions.broadcast(notification, authToken, gameId);
     }
 }
