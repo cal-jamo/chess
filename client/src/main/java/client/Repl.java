@@ -29,6 +29,7 @@ public class Repl implements NotiHandler {
     private final String serverUrl;
     private ChessGame.TeamColor playerColor;
     private Integer gameJoinedId;
+    private ChessGame currGame;
 
 
 
@@ -93,6 +94,9 @@ public class Repl implements NotiHandler {
                 break;
             case "resign":
                 resign(scanner);
+            case "highlight":
+                highlight(tokens);
+                break;
             default:
                 out.println("Unknown command. Type 'help' for options.");
                 break;
@@ -162,11 +166,48 @@ public class Repl implements NotiHandler {
     private void redraw() {
         if (gameJoinedId == null) {
             out.println("Error: You are not in a game.");
+            return;
         }
+        if (currGame == null) {
+            out.println("Error: No game state loaded.");
+            return;
+        }
+        out.println();
+        drawBoardInternal(new PrintStream(System.out, true, StandardCharsets.UTF_8), currGame.getBoard(), this.playerColor, null);
+        out.print("\n[LOGGED_IN] >>> ");
+    }
+    private void highlight(String[] tokens) {
         try {
-            wsFacade.sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameJoinedId));
+            if (tokens.length < 2) {
+                out.println("Usage: highlight <POSITION> (e.g., highlight e2)");
+                return;
+            }
+            if (currGame == null) {
+                out.println("Error: No game loaded. Join a game first.");
+                return;
+            }
+            String posStr = tokens[1];
+            if (posStr.length() != 2) {
+                out.println("Invalid position.");
+                return;
+            }
+            int col = posStr.charAt(0) - 'a' + 1;
+            int row = posStr.charAt(1) - '1' + 1;
+            chess.ChessPosition start = new chess.ChessPosition(row, col);
+            java.util.Collection<chess.ChessMove> moves = currGame.validMoves(start);
+            if (moves == null || moves.isEmpty()) {
+                out.println("No valid moves for that piece.");
+                return;
+            }
+            java.util.Collection<chess.ChessPosition> highlights = new java.util.ArrayList<>();
+            highlights.add(start);
+            for (chess.ChessMove move : moves) {
+                highlights.add(move.getEndPosition());
+            }
+            out.println();
+            drawBoardInternal(new PrintStream(System.out, true, StandardCharsets.UTF_8), currGame.getBoard(), this.playerColor, highlights);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            out.println("Error: " + e.getMessage());
         }
     }
     private chess.ChessPosition parsePos(String pos) throws Exception {
@@ -255,7 +296,7 @@ public class Repl implements NotiHandler {
     private void listGames() {
         try {
             var listOfGames = serverFacade.listGames(authToken);
-            this.localGamesList.clear(); // 1. Clear the old list
+            this.localGamesList.clear();
             this.localGamesList.addAll(listOfGames);
             out.println("\nList of games: " + localGamesList.size());
             if (localGamesList.isEmpty()) {
@@ -375,6 +416,8 @@ public class Repl implements NotiHandler {
         out.println("  redraw        - Redraw a board");
         out.println("  leave        - Leave a game");
         out.println("  move <e2> <e4>   - Move a piece from one spot to another");
+        out.println("  resign        - Resign from a game");
+        out.println("  highlight <e2>  - Highlight legal moves a piece can make");
         out.println();
     }
     private void printPreLoginHelp() {
@@ -392,15 +435,15 @@ public class Repl implements NotiHandler {
         ChessGame chessGame = (ChessGame) game.game();
         chess.ChessBoard board = chessGame.getBoard();
         if (perspective.equalsIgnoreCase("WHITE")) {
-            drawBoardInternal(out, board, ChessGame.TeamColor.WHITE);
+            drawBoardInternal(out, board, ChessGame.TeamColor.WHITE, null);
         } else {
-            drawBoardInternal(out, board, ChessGame.TeamColor.BLACK);
+            drawBoardInternal(out, board, ChessGame.TeamColor.BLACK, null);
         }
         out.print(EscapeSequences.RESET_TEXT_COLOR);
         out.print(EscapeSequences.RESET_BG_COLOR);
         out.println();
     }
-    private void drawBoardInternal(PrintStream out, chess.ChessBoard board, ChessGame.TeamColor perspective) {
+    private void drawBoardInternal(PrintStream out, chess.ChessBoard board, ChessGame.TeamColor perspective, java.util.Collection<chess.ChessPosition> highlights) {
         drawHeader(out, perspective);
         int startRow = (perspective == ChessGame.TeamColor.WHITE) ? 8 : 1;
         int endRow = (perspective == ChessGame.TeamColor.WHITE) ? 1 : 8;
@@ -411,11 +454,20 @@ public class Repl implements NotiHandler {
         for (int row = startRow; row != endRow + rowIncrement; row += rowIncrement) {
             drawRowLabel(out, row);
             for (int col = startCol; col != endCol + colIncrement; col += colIncrement) {
+                chess.ChessPosition currentPos = new chess.ChessPosition(row, col);
                 boolean isLightSquare = (row + col) % 2 != 0;
-                if (isLightSquare) {
-                    out.print(EscapeSequences.SET_BG_COLOR_WHITE);
+                if (highlights != null && highlights.contains(currentPos)) {
+                    if (isLightSquare) {
+                        out.print(EscapeSequences.SET_BG_COLOR_GREEN);
+                    } else {
+                        out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                    }
                 } else {
-                    out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                    if (isLightSquare) {
+                        out.print(EscapeSequences.SET_BG_COLOR_WHITE);
+                    } else {
+                        out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+                    }
                 }
                 String piece = getPieceFromBoard(board, row, col);
                 out.print(piece);
@@ -465,7 +517,7 @@ public class Repl implements NotiHandler {
                 case PAWN -> pieceColor + EscapeSequences.WHITE_PAWN;
             };
         } else {
-            String pieceColor = EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY;
+            String pieceColor = EscapeSequences.SET_TEXT_COLOR_BLACK;
             return switch (piece.getPieceType()) {
                 case ROOK -> pieceColor + EscapeSequences.BLACK_ROOK;
                 case KNIGHT -> pieceColor + EscapeSequences.BLACK_KNIGHT;
@@ -481,8 +533,9 @@ public class Repl implements NotiHandler {
         switch (message.getServerMessageType()) {
             case LOAD_GAME -> {
                 LoadGameMessage loadGame = (LoadGameMessage) message;
+                this.currGame = loadGame.getGame();
                 out.println();
-                drawBoardInternal(new PrintStream(System.out, true, StandardCharsets.UTF_8), loadGame.getGame().getBoard(), this.playerColor);
+                drawBoardInternal(new PrintStream(System.out, true, StandardCharsets.UTF_8), loadGame.getGame().getBoard(), this.playerColor, null);
                 out.print("\n[LOGGED_IN] >>> ");
             }
             case NOTIFICATION -> {
