@@ -11,6 +11,7 @@ import java.util.Scanner;
 import ui.EscapeSequences;
 import websocket.NotiHandler;
 import websocket.WSFacade;
+import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
@@ -214,9 +215,9 @@ public class Repl implements NotiHandler {
             int gameID = gameToJoin.gameID();
 
             serverFacade.joinGame(gameID, color, this.authToken);
-
             out.println("Successfully joined game " + gameToJoin.gameName() + " as " + color);
-            drawChessboard(gameToJoin, color);
+            this.wsFacade = new WSFacade(this, serverUrl);
+            wsFacade.sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID));
 
         } catch (ServerFacade.ServerFacadeException message) {
             out.println(message.getMessage());
@@ -249,7 +250,12 @@ public class Repl implements NotiHandler {
             }
             int gameNumber = Integer.parseInt(tokens[1]);
             GameData gameToJoin = this.localGamesList.get(gameNumber - 1);
-            drawChessboard(gameToJoin, "WHITE");
+            try {
+                this.wsFacade = new WSFacade(this, serverUrl);
+                wsFacade.sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameToJoin.gameID()));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         } catch (IndexOutOfBoundsException | NumberFormatException e) {
             out.println("Error: Invalid game ID. Run 'list' to see available games.");
         }
