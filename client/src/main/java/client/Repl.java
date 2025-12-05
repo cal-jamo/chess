@@ -17,9 +17,7 @@ import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
-
 import static java.lang.System.out;
-
 public class Repl implements NotiHandler {
     private boolean isLoggedIn = false;
     private final ServerFacade serverFacade;
@@ -30,14 +28,10 @@ public class Repl implements NotiHandler {
     private ChessGame.TeamColor playerColor;
     private Integer gameJoinedId;
     private ChessGame currGame;
-
-
-
     public Repl(String serverUrl) {
         this.serverUrl = serverUrl;
         this.serverFacade = new ServerFacade(serverUrl);
     }
-
     public void run() {
         out.println("♕ Welcome to Chess. Type 'help' to get started.");
         Scanner scanner = new Scanner(System.in);
@@ -62,47 +56,22 @@ public class Repl implements NotiHandler {
         scanner.close();
         out.println("Exiting Chess.");
     }
-
     private void handlePostLoginCommands(String command, String[] tokens, Scanner scanner) {
         switch (command) {
-            case "help":
-                printPostLoginHelp();
-                break;
-            case "logout":
-                logout();
-                break;
-            case "create":
-                createGame(tokens);
-                break;
-            case "list":
-                listGames();
-                break;
-            case "join":
-                joinGame(tokens);
-                break;
-            case "observe":
-                observeGame(tokens);
-                break;
-            case "leave":
-                leave();
-                break;
-            case "move":
-                movePiece(tokens);
-                break;
-            case "redraw":
-                redraw();
-                break;
-            case "resign":
-                resign(scanner);
-            case "highlight":
-                highlight(tokens);
-                break;
-            default:
-                out.println("Unknown command. Type 'help' for options.");
-                break;
+            case "help" -> printPostLoginHelp();
+            case "logout" -> logout();
+            case "create" -> createGame(tokens);
+            case "list" -> listGames();
+            case "join" -> joinGame(tokens);
+            case "observe" -> observeGame(tokens);
+            case "leave" -> leave();
+            case "move" -> movePiece(tokens);
+            case "redraw" -> redraw();
+            case "resign" -> resign(scanner);
+            case "highlight" -> highlight(tokens);
+            default -> out.println("Unknown command. Type 'help' for options.");
         }
     }
-
     private void movePiece(String[] tokens) {
         try {
             if (tokens.length > 3) {
@@ -219,7 +188,6 @@ public class Repl implements NotiHandler {
         if (col < 1 || col > 8 || row < 1 || row > 8) throw new Exception("Position out of bounds: " + pos);
         return new chess.ChessPosition(row, col);
     }
-
     private void handlePreLoginCommands(String command, Scanner scanner) {
         switch (command) {
             case "help":
@@ -238,7 +206,6 @@ public class Repl implements NotiHandler {
                 break;
         }
     }
-
     private void register(Scanner scanner) {
         try {
             out.print("Enter username: ");
@@ -247,9 +214,7 @@ public class Repl implements NotiHandler {
             String password = scanner.nextLine();
             out.print("Enter email: ");
             String email = scanner.nextLine();
-
             AuthData authData = serverFacade.register(username, password, email);
-
             this.authToken = authData.authToken();
             this.isLoggedIn = true;
             out.println("\nRegistration successful. You are now logged in " + username);
@@ -261,7 +226,6 @@ public class Repl implements NotiHandler {
             out.println("An unexpected error occurred while registering: " + message.getMessage());
         }
     }
-
     private void login(Scanner scanner) {
         try {
             out.print("Enter username: ");
@@ -274,13 +238,10 @@ public class Repl implements NotiHandler {
             this.isLoggedIn = true;
             out.println("\nLogin successful. You are now logged in " + username);
             listGames();
-        } catch (ServerFacade.ServerFacadeException message) {
-            out.println(message.getMessage());
-        } catch (Exception message) {
-            out.println("An unexpected error occurred while logging in: " + message.getMessage());
+        } catch (ServerFacade.ServerFacadeException message) {out.println(message.getMessage());
+        } catch (Exception message) { out.println("An unexpected error occurred while logging in: " + message.getMessage());
         }
     }
-
     private void logout() {
         try {
             serverFacade.logout(this.authToken);
@@ -292,7 +253,6 @@ public class Repl implements NotiHandler {
             System.out.println("Logout failed: " + e.getMessage());
         }
     }
-
     private void listGames() {
         try {
             var listOfGames = serverFacade.listGames(authToken);
@@ -318,7 +278,6 @@ public class Repl implements NotiHandler {
             out.println("An unexpected error occurred while logging out: " + message.getMessage());
         }
     }
-
     private void joinGame(String[] tokens) {
         if (tokens.length != 3) {
             out.println("Error: Incorrect number of arguments.");
@@ -348,7 +307,6 @@ public class Repl implements NotiHandler {
             }
             GameData gameToJoin = this.localGamesList.get(gameNum - 1);
             int gameID = gameToJoin.gameID();
-
             serverFacade.joinGame(gameID, color, this.authToken);
             out.println("Successfully joined game " + gameToJoin.gameName() + " as " + color);
             if (color.equalsIgnoreCase("WHITE")) {
@@ -366,7 +324,6 @@ public class Repl implements NotiHandler {
             out.println("An unexpected system error occurred: " + e.getMessage());
         }
     }
-
     private void createGame(String[] tokens) {
         try {
             if (tokens.length < 2) {
@@ -381,7 +338,6 @@ public class Repl implements NotiHandler {
             out.println("Failed to create game: " + e.getMessage());
         }
     }
-
     private void observeGame(String[] tokens) {
         try {
             if (tokens.length < 2) {
@@ -403,7 +359,6 @@ public class Repl implements NotiHandler {
             out.println("Error: Invalid game ID. Run 'list' to see available games.");
         }
     }
-
     private void printPostLoginHelp() {
         out.println();
         out.println("Available commands:");
@@ -427,20 +382,6 @@ public class Repl implements NotiHandler {
         out.println("  register  - Create your new account");
         out.println("  login     - Log in to your existing account");
         out.println("  quit      - Exit the app");
-        out.println();
-    }
-    private void drawChessboard(GameData game, String perspective) {
-        var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-        out.print(EscapeSequences.ERASE_SCREEN);
-        ChessGame chessGame = (ChessGame) game.game();
-        chess.ChessBoard board = chessGame.getBoard();
-        if (perspective.equalsIgnoreCase("WHITE")) {
-            drawBoardInternal(out, board, ChessGame.TeamColor.WHITE, null);
-        } else {
-            drawBoardInternal(out, board, ChessGame.TeamColor.BLACK, null);
-        }
-        out.print(EscapeSequences.RESET_TEXT_COLOR);
-        out.print(EscapeSequences.RESET_BG_COLOR);
         out.println();
     }
     private void drawBoardInternal(PrintStream out, chess.ChessBoard board, ChessGame.TeamColor perspective, java.util.Collection<chess.ChessPosition> highlights) {
