@@ -89,7 +89,7 @@ public class Repl implements NotiHandler {
                 movePiece(tokens);
                 break;
             case "redraw":
-                redraw();
+                // redraw();
                 break;
             default:
                 out.println("Unknown command. Type 'help' for options.");
@@ -121,6 +121,20 @@ public class Repl implements NotiHandler {
             chess.ChessMove move = new chess.ChessMove(startPos, endPos, promotionPiece);
             wsFacade.sendCommand(new websocket.commands.MakeMoveCommand(authToken, gameJoinedId, move));
             out.println("Move sent!");
+        } catch (Exception e) {
+            out.println("Error: " + e.getMessage());
+        }
+    }
+    private void leave() {
+        try {
+            if (gameJoinedId != null) {
+                wsFacade.sendCommand(new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameJoinedId));
+                gameJoinedId = null;
+                playerColor = null;
+                out.println("Left the game.");
+            } else {
+                out.println("Error: You are not in a game.");
+            }
         } catch (Exception e) {
             out.println("Error: " + e.getMessage());
         }
