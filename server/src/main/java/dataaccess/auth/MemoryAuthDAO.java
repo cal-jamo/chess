@@ -7,7 +7,6 @@ import java.util.UUID;
 public class MemoryAuthDAO implements AuthDAO {
     private final HashMap<String, AuthData> authTokens = new HashMap<>();
 
-    // method used to create an auth session and store it in my auth tokens storage
     @Override
     public AuthData createAuth(String username) {
         String authToken = UUID.randomUUID().toString();
@@ -16,7 +15,6 @@ public class MemoryAuthDAO implements AuthDAO {
         return authData;
     }
 
-    // Simply takes in an auth token and returns the stored auth data corresponding to the auth token
     @Override
     public AuthData getAuth(String authToken) {
         return authTokens.get(authToken);
@@ -31,7 +29,6 @@ public class MemoryAuthDAO implements AuthDAO {
         }
     }
 
-    // clear out the hash map
     @Override
     public void clear() {
         authTokens.clear();
