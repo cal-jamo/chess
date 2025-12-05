@@ -378,7 +378,7 @@ public class Repl implements NotiHandler {
                 LoadGameMessage loadGame = (LoadGameMessage) message;
                 out.println();
                 drawBoardInternal(new PrintStream(System.out, true, StandardCharsets.UTF_8), loadGame.getGame().getBoard(), ChessGame.TeamColor.WHITE);
-                out.print("\n[LOGGED_IN] >>> "); // Reprint prompt
+                out.print("\n[LOGGED_IN] >>> ");
             }
             case NOTIFICATION -> {
                 NotificationMessage noti = (NotificationMessage) message;
