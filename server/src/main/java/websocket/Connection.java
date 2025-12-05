@@ -11,7 +11,7 @@ public class Connection {
         this.authToken = authToken;
         this.gameId = gameId;
     }
-    public void send(String msg) throws IOException {
+    public synchronized void send(String msg) throws IOException {
         session.getRemote().sendString(msg);
     }
 }

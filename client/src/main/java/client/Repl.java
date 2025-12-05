@@ -89,7 +89,7 @@ public class Repl implements NotiHandler {
                 movePiece(tokens);
                 break;
             case "redraw":
-                // redraw();
+                redraw();
                 break;
             default:
                 out.println("Unknown command. Type 'help' for options.");
@@ -137,6 +137,16 @@ public class Repl implements NotiHandler {
             }
         } catch (Exception e) {
             out.println("Error: " + e.getMessage());
+        }
+    }
+    private void redraw() {
+        if (gameJoinedId == null) {
+            out.println("Error: You are not in a game.");
+        }
+        try {
+            wsFacade.sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameJoinedId));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
     private chess.ChessPosition parsePos(String pos) throws Exception {

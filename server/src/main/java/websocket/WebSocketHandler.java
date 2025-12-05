@@ -35,9 +35,10 @@ public class WebSocketHandler {
     }
 
     public void handleMessage(WsMessageContext cx) {
+        UserGameCommand command = null;
         try {
             String message = cx.message();
-            UserGameCommand command = gson.fromJson(message, UserGameCommand.class);
+            command = gson.fromJson(message, UserGameCommand.class);
             switch (command.getCommandType()) {
                 case CONNECT -> connect(command.getAuthToken(), command.getGameID(), cx);
                 case MAKE_MOVE -> {
@@ -53,7 +54,15 @@ public class WebSocketHandler {
             }
         } catch (Exception e) {
             ErrorMessage errorMessage = new ErrorMessage("Error: " + e.getMessage());
-            cx.send(gson.toJson(errorMessage));
+            try {
+                if (command != null && sessions.sessions.containsKey(command.getAuthToken())) {
+                    sessions.sessions.get(command.getAuthToken()).send(gson.toJson(errorMessage));
+                } else {
+                    cx.send(gson.toJson(errorMessage));
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -177,7 +186,7 @@ public class WebSocketHandler {
             var connection = new Connection(authToken, cx.session, gameId);
             sessions.add(authToken, connection);
             LoadGameMessage loadGame = new LoadGameMessage(gameData.game());
-            cx.send(gson.toJson(loadGame));
+            connection.send(gson.toJson(loadGame));
             String message;
             if (Objects.equals(authData.username(), gameData.whiteUsername())) {
                 message = String.format("%s joined as White", authData.username());

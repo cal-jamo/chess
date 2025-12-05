@@ -19,7 +19,11 @@ public class ConnectionManager {
             if(sesh.session.isOpen()) {
                 if(sesh.gameId.equals(gameId)) {
                     if(!sesh.authToken.equals(authToken)) {
-                        sesh.send(new Gson().toJson(notification));
+                        try {
+                            sesh.send(new Gson().toJson(notification));
+                        } catch (IOException e) {
+                            removeList.add(sesh.authToken);
+                        }
                     }
                 }
             } else {
