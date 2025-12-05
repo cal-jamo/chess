@@ -384,20 +384,21 @@ public class Repl implements NotiHandler {
         out.println("  quit      - Exit the app");
         out.println();
     }
-    private void drawBoardInternal(PrintStream out, chess.ChessBoard board, ChessGame.TeamColor perspective, java.util.Collection<chess.ChessPosition> highlights) {
-        drawHeader(out, perspective);
-        int startRow = (perspective == ChessGame.TeamColor.WHITE) ? 8 : 1;
-        int endRow = (perspective == ChessGame.TeamColor.WHITE) ? 1 : 8;
-        int rowIncrement = (perspective == ChessGame.TeamColor.WHITE) ? -1 : 1;
-        int startCol = (perspective == ChessGame.TeamColor.WHITE) ? 1 : 8;
-        int endCol = (perspective == ChessGame.TeamColor.WHITE) ? 8 : 1;
-        int colIncrement = (perspective == ChessGame.TeamColor.WHITE) ? 1 : -1;
+    private void drawBoardInternal(
+            PrintStream out, chess.ChessBoard board, ChessGame.TeamColor color, java.util.Collection<chess.ChessPosition> mvs) {
+        drawHeader(out, color);
+        int startRow = (color == ChessGame.TeamColor.WHITE) ? 8 : 1;
+        int endRow = (color == ChessGame.TeamColor.WHITE) ? 1 : 8;
+        int rowIncrement = (color == ChessGame.TeamColor.WHITE) ? -1 : 1;
+        int startCol = (color == ChessGame.TeamColor.WHITE) ? 1 : 8;
+        int endCol = (color == ChessGame.TeamColor.WHITE) ? 8 : 1;
+        int colIncrement = (color == ChessGame.TeamColor.WHITE) ? 1 : -1;
         for (int row = startRow; row != endRow + rowIncrement; row += rowIncrement) {
             drawRowLabel(out, row);
             for (int col = startCol; col != endCol + colIncrement; col += colIncrement) {
                 chess.ChessPosition currentPos = new chess.ChessPosition(row, col);
                 boolean isLightSquare = (row + col) % 2 != 0;
-                if (highlights != null && highlights.contains(currentPos)) {
+                if (mvs != null && mvs.contains(currentPos)) {
                     if (isLightSquare) {
                         out.print(EscapeSequences.SET_BG_COLOR_GREEN);
                     } else {
@@ -417,7 +418,7 @@ public class Repl implements NotiHandler {
             drawRowLabel(out, row);
             out.println();
         }
-        drawHeader(out, perspective);
+        drawHeader(out, color);
     }
     private void drawHeader(PrintStream out, ChessGame.TeamColor perspective) {
         out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
