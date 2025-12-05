@@ -9,17 +9,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import ui.EscapeSequences;
+import websocket.NotiHandler;
+import websocket.WSFacade;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 import static java.lang.System.out;
 
-public class Repl {
+public class Repl implements NotiHandler {
     private boolean isLoggedIn = false;
     private final ServerFacade serverFacade;
     private String authToken = null;
     private List<GameData> localGamesList = new ArrayList<>();
+    private WSFacade wsFacade;
+    private final String serverUrl;
+
 
 
     public Repl(String serverUrl) {
+        this.serverUrl = serverUrl;
         this.serverFacade = new ServerFacade(serverUrl);
     }
 
@@ -353,6 +363,26 @@ public class Repl {
                 case KING -> pieceColor + EscapeSequences.BLACK_KING;
                 case PAWN -> pieceColor + EscapeSequences.BLACK_PAWN;
             };
+        }
+    }
+    @Override
+    public void notify(ServerMessage message) {
+        switch (message.getServerMessageType()) {
+            case LOAD_GAME -> {
+                LoadGameMessage loadGame = (LoadGameMessage) message;
+                drawBoardInternal(new PrintStream(System.out, true, StandardCharsets.UTF_8), loadGame.getGame().getBoard(), ChessGame.TeamColor.WHITE);
+                out.print("\n[LOGGED_IN] >>> "); // Reprint prompt
+            }
+            case NOTIFICATION -> {
+                NotificationMessage noti = (NotificationMessage) message;
+                out.println(EscapeSequences.SET_TEXT_COLOR_GREEN + noti.getNotification() + EscapeSequences.RESET_TEXT_COLOR);
+                out.print("[LOGGED_IN] >>> ");
+            }
+            case ERROR -> {
+                ErrorMessage error = (ErrorMessage) message;
+                out.println(EscapeSequences.SET_TEXT_COLOR_RED + error.getError() + EscapeSequences.RESET_TEXT_COLOR);
+                out.print("[LOGGED_IN] >>> ");
+            }
         }
     }
 }
