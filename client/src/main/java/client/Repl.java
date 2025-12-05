@@ -91,6 +91,8 @@ public class Repl implements NotiHandler {
             case "redraw":
                 redraw();
                 break;
+            case "resign":
+                resign(scanner);
             default:
                 out.println("Unknown command. Type 'help' for options.");
                 break;
@@ -121,6 +123,24 @@ public class Repl implements NotiHandler {
             chess.ChessMove move = new chess.ChessMove(startPos, endPos, promotionPiece);
             wsFacade.sendCommand(new websocket.commands.MakeMoveCommand(authToken, gameJoinedId, move));
             out.println("Move sent!");
+        } catch (Exception e) {
+            out.println("Error: " + e.getMessage());
+        }
+    }
+    private void resign(Scanner scanner) {
+        try {
+            if (gameJoinedId == null) {
+                out.println("Error: You are not in a game.");
+                return;
+            }
+            out.print("Are you sure you want to resign? This will end the game. (yes/no): ");
+            String input = scanner.nextLine();
+            if (!input.equalsIgnoreCase("yes")) {
+                out.println("Resignation cancelled.");
+                return;
+            }
+            wsFacade.sendCommand(new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameJoinedId));
+            out.println("Resigned from the game.");
         } catch (Exception e) {
             out.println("Error: " + e.getMessage());
         }

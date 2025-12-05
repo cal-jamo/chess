@@ -56,7 +56,13 @@ public class Server {
             }
         });
         javalin.ws("/ws", ws -> {
+            ws.onConnect(ctx -> {
+                ctx.session.setIdleTimeout(java.time.Duration.ofMinutes(60));
+            });
             ws.onMessage(webSocketHandler::handleMessage);
+            ws.onError(ctx -> {
+                System.out.println("WebSocket Error: " + ctx.error());
+            });
         });
         javalin.post("/user", (req) -> {
             try {

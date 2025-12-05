@@ -28,6 +28,7 @@ public class WSFacade extends Endpoint {
             this.notiHandler = notiHandler;
             WebSocketContainer wSContainer = ContainerProvider.getWebSocketContainer();
             this.session = wSContainer.connectToServer(this, uri);
+            this.session.setMaxIdleTimeout(60 * 60 * 1000);
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {

@@ -99,16 +99,16 @@ public class ChessGame {
         ChessPiece pieceToMove = board.getPiece(move.getStartPosition());
 
         if (pieceToMove == null) {
-            throw new InvalidMoveException("Error: No piece at start position.");
+            throw new InvalidMoveException("No piece at start position.");
         }
 
         if (pieceToMove.getTeamColor() != getTeamTurn()) {
-            throw new InvalidMoveException("Error: Not your turn.");
+            throw new InvalidMoveException("Not your turn.");
         }
 
         Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
         if (!validMoves.contains(move)) {
-            throw new InvalidMoveException("Error: Illegal move.");
+            throw new InvalidMoveException("Illegal move.");
         }
 
         ChessPiece piece = board.getPiece(move.getStartPosition());
