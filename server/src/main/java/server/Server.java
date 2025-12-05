@@ -70,7 +70,8 @@ public class Server {
                 req.status(200).json(authData);
             } catch (DataAccessException e) {
                 if (e.getMessage().equals("Error: Username already exists")) { req.status(403).json(java.util.Map.of("message", e.getMessage()));
-                } else if (e.getMessage().equals("Error: Username and password cannot be null")) { req.status(400).json(java.util.Map.of("message", e.getMessage()));
+                } else if (e.getMessage().equals("Error: Username and password cannot be null")) {
+                    req.status(400).json(java.util.Map.of("message", e.getMessage()));
                 } else {req.status(500).json(java.util.Map.of("message", String.format("Error: %s", e.getMessage())));}}
         });
         javalin.post("/session", (req) -> {
@@ -79,8 +80,10 @@ public class Server {
                 var authSession = userService.loginUser(userData);
                 req.status(200).json(authSession);
             } catch (DataAccessException e) {
-                if (e.getMessage().equals("Error: Username and Password cannot be null")) { req.status(400).json(java.util.Map.of("message", e.getMessage()));
-                } else if (e.getMessage().equals("Error: Username and password does not match")) { req.status(401).json(java.util.Map.of("message", e.getMessage()));
+                if (e.getMessage().equals("Error: Username and Password cannot be null")) {
+                    req.status(400).json(java.util.Map.of("message", e.getMessage()));
+                } else if (e.getMessage().equals("Error: Username and password does not match")) {
+                    req.status(401).json(java.util.Map.of("message", e.getMessage()));
                 }
                 else {req.status(500).json(java.util.Map.of("message", String.format("Error: %s", e.getMessage())));}}
         });
