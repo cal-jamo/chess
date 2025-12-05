@@ -376,16 +376,19 @@ public class Repl implements NotiHandler {
         switch (message.getServerMessageType()) {
             case LOAD_GAME -> {
                 LoadGameMessage loadGame = (LoadGameMessage) message;
+                out.println();
                 drawBoardInternal(new PrintStream(System.out, true, StandardCharsets.UTF_8), loadGame.getGame().getBoard(), ChessGame.TeamColor.WHITE);
                 out.print("\n[LOGGED_IN] >>> "); // Reprint prompt
             }
             case NOTIFICATION -> {
                 NotificationMessage noti = (NotificationMessage) message;
+                out.println();
                 out.println(EscapeSequences.SET_TEXT_COLOR_GREEN + noti.getNotification() + EscapeSequences.RESET_TEXT_COLOR);
                 out.print("[LOGGED_IN] >>> ");
             }
             case ERROR -> {
                 ErrorMessage error = (ErrorMessage) message;
+                out.println();
                 out.println(EscapeSequences.SET_TEXT_COLOR_RED + error.getError() + EscapeSequences.RESET_TEXT_COLOR);
                 out.print("[LOGGED_IN] >>> ");
             }
